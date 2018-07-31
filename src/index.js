@@ -1,12 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-
-const title = 'foo';
+import {Provider} from 'react-redux';
+import App from './App.jsx';
+import store from './store';
+import './firebase';
+import 'bulma/css/bulma.css';
+import 'leaflet/dist/leaflet.css';
 
 ReactDOM.render(
-  <div>{title}</div>,
-  document.getElementById('app')
+    <Provider store={store}>
+        <App />
+    </Provider>,
+    document.getElementById('app')
 );
 
-
-module.hot.accept();
+// eslint-disable-next-line no-undef
+module.hot && module.hot.accept();

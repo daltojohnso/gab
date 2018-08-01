@@ -1,13 +1,15 @@
 import React from 'react';
 import {NavBar} from '~/components';
-import {Foo} from '~/pages';
+import {MainView} from '~/pages';
 import {Route} from 'react-router-dom';
 
 const NavView = () => (
-    <div>
+    <React.Fragment>
         <NavBar />
-        <Route exact path="/" component={Foo} />
-    </div>
+        <main style={{width: '100%', height: 'calc(100% - 52px)'}}>
+            <Route exact path="/" component={MainView} />
+        </main>
+    </React.Fragment>
 );
 
 export default NavView;

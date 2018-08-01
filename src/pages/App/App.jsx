@@ -49,21 +49,19 @@ class App extends React.Component {
     render() {
         return this.props.isReady ? (
             <Router>
-                <div>
-                    <Switch>
-                        <Unauthed
-                            exact
-                            path="/login"
-                            component={Login}
-                            isLoggedIn={this.props.isLoggedIn}
-                        />
-                        <Authed
-                            path="/"
-                            component={NavView}
-                            isLoggedIn={this.props.isLoggedIn}
-                        />
-                    </Switch>
-                </div>
+                <Switch>
+                    <Unauthed
+                        exact
+                        path="/login"
+                        component={Login}
+                        isLoggedIn={this.props.isLoggedIn}
+                    />
+                    <Authed
+                        path="/"
+                        component={NavView}
+                        isLoggedIn={this.props.isLoggedIn}
+                    />
+                </Switch>
             </Router>
         ) : null;
     }

@@ -1,7 +1,15 @@
 import React from 'react';
+import {UserButton} from '~/components';
+import styled from 'styled-components';
+
+const Nav = styled.nav`
+    &.navbar {
+        z-index: 500;
+    }
+`;
 
 const NavBar = () => (
-    <nav className="navbar is-dark">
+    <Nav className="navbar is-dark">
         <div className="navbar-brand">
             <div className="navbar-item">
                 <a>
@@ -9,7 +17,12 @@ const NavBar = () => (
                 </a>
             </div>
         </div>
-    </nav>
+        <div className="navbar-menu">
+            <div className="navbar-end">
+                <UserButton className="navbar-item" />
+            </div>
+        </div>
+    </Nav>
 );
 
 export default NavBar;

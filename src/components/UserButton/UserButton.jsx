@@ -34,6 +34,10 @@ class UserButton extends React.Component {
 
     render() {
         const {isActive} = this.state;
+        const {
+            user: {displayName, email},
+            onSignOut
+        } = this.props;
         return (
             <div className={classNames(this.props.className)}>
                 <div
@@ -48,9 +52,15 @@ class UserButton extends React.Component {
                     </DropdownTrigger>
                     <div className="dropdown-menu" role="menu">
                         <div className="dropdown-content">
-                            <div className="dropdown-item">foo</div>
+                            <div className="dropdown-item">
+                                {displayName || email}
+                            </div>
                             <hr className="dropdown-divider" />
-                            <a className="dropdown-item" tabIndex="0">
+                            <a
+                                className="dropdown-item"
+                                tabIndex="0"
+                                onClick={() => onSignOut()}
+                            >
                                 Sign out
                             </a>
                         </div>
@@ -62,7 +72,13 @@ class UserButton extends React.Component {
 }
 
 UserButton.propTypes = {
-    className: PropTypes.string
+    className: PropTypes.string,
+    user: PropTypes.object,
+    onSignOut: PropTypes.func
+};
+
+UserButton.defaultProps = {
+    user: {}
 };
 
 export default UserButton;

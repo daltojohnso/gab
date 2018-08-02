@@ -13,7 +13,7 @@ const NavBar = () => (
         <div className="navbar-brand">
             <div className="navbar-item">
                 <a>
-                    <h1 className="title has-text-white">gabgab</h1>
+                    <h1 className="title has-text-white">gab</h1>
                 </a>
             </div>
         </div>

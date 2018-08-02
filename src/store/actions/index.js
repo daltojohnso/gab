@@ -17,11 +17,28 @@ export const signedIn = () => ({
     type: 'auth/finishedSigningIn'
 });
 
+export const signingOut = () => ({
+    type: 'auth/signingOut'
+});
+
+export const signedOut = () => ({
+    type: 'auth/finishedSigningOut'
+});
+
+export const signOut = () => {
+    return dispatch => {
+        dispatch(signingOut());
+        firebaseSignOut().then(() => {
+            dispatch(signedOut());
+        });
+    };
+};
+
 export const loginWithEmailAndPassword = (email, password) => {
     return dispatch => {
         dispatch(signingIn());
         return firebaseSignInWithEmailAndPassword(email, password).then(() => {
-            dispatch(signingIn());
+            dispatch(signedIn());
         });
     };
 };
@@ -35,6 +52,6 @@ export function firebaseSignInWithEmailAndPassword(email, password) {
         });
 }
 
-export function signOut() {
+export function firebaseSignOut() {
     return firebase.auth().signOut();
 }

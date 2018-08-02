@@ -19,6 +19,17 @@ class MarkerMap extends React.Component {
             position: marker ? marker.position : [0, 0],
             zoom: 3
         };
+        this.mapRef = React.createRef();
+    }
+
+    // TODO: normalize lat, lng for super-far-away map clicks
+    // may need to set maxBounds
+    onClick(e) {
+        const {lat, lng} = e.latlng;
+        this.setState({
+            position: [lat, lng],
+            zoom: 7
+        });
     }
 
     render() {
@@ -28,6 +39,9 @@ class MarkerMap extends React.Component {
                 style={{height: '100%', width: '100%'}}
                 center={position}
                 zoom={zoom}
+                worldCopyJump={true}
+                ref={this.mapRef}
+                onClick={this.onClick.bind(this)}
             >
                 <TileLayer
                     attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"

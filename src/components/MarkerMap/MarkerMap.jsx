@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Map, TileLayer} from 'react-leaflet';
+import {Map, TileLayer, Marker} from 'react-leaflet';
 import random from 'lodash/random';
 
 // https://www.npmjs.com/package/react-leaflet-div-icon
@@ -26,14 +26,23 @@ class MarkerMap extends React.Component {
     // may need to set maxBounds
     onClick(e) {
         const {lat, lng} = e.latlng;
+        const position = [lat, lng];
         this.setState({
-            position: [lat, lng],
-            zoom: 7
+            position,
+            zoom: 7,
+            newMarker: this.createMarker(position)
         });
+
+        this.props.onNewMarker(position);
+    }
+
+    createMarker(position) {
+        return <Marker position={position} />;
     }
 
     render() {
-        const {position, zoom} = this.state;
+        const {position, zoom, newMarker} = this.state;
+        const {markers} = this.props;
         return (
             <Map
                 style={{height: '100%', width: '100%'}}
@@ -47,17 +56,23 @@ class MarkerMap extends React.Component {
                     attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
+                {newMarker}
+                {markers}
             </Map>
         );
     }
 }
 
 MarkerMap.propTypes = {
-    markers: PropTypes.arrayOf(PropTypes.object)
+    markers: PropTypes.arrayOf(PropTypes.object),
+    onNewMarker: PropTypes.func
+    // onClick: PropTypes.func
 };
 
 MarkerMap.defaultProps = {
-    markers: []
+    markers: [],
+    onNewMarker: () => {}
+    // onClick: () => {}
 };
 
 export default MarkerMap;

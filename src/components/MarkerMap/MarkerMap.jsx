@@ -77,7 +77,7 @@ class MarkerMap extends React.Component {
             <Map
                 style={{height: '100%', width: '100%'}}
                 center={selectedMarker ? selectedMarker.location : position}
-                zoom={selectedMarker ? 8 : zoom}
+                zoom={zoom}
                 worldCopyJump={true}
                 ref={this.mapRef}
                 onClick={this.onClick.bind(this)}

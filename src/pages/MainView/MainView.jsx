@@ -64,7 +64,8 @@ class MainView extends React.Component {
         const note = this.props.notes.find(note => note.id === id);
         this.setState({
             isEditorOpen: true,
-            note
+            note,
+            selectedMarker: null
         });
     }
 

@@ -1,6 +1,9 @@
 import React from 'react';
+import {connect} from 'react-redux';
+import {fetchMaps} from '~/store/actions/maps';
 import {MarkerMap, TextEditor} from '~/components';
 import styled from 'styled-components';
+import get from 'lodash/get';
 
 const Wrapper = styled.div`
     height: 100%;
@@ -29,9 +32,7 @@ const FloatyInner = styled.div`
 
 const Floater = ({children}) => (
     <FloatyWrapper>
-        <FloatyInner>
-            {children}
-        </FloatyInner>
+        <FloatyInner>{children}</FloatyInner>
     </FloatyWrapper>
 );
 
@@ -40,21 +41,39 @@ class MainView extends React.Component {
         super();
         this.state = {
             isEditorOpen: false,
-            position: null
+            selectedMarker: null,
+            note: null
         };
     }
 
-    onNewMarker(position) {
+    componentDidMount() {
+        this.props.fetchMapsAndSelectFirst();
+    }
+
+    onMapClick(location) {
         this.setState({
             isEditorOpen: true,
-            position
+            note: null,
+            selectedMarker: {
+                location
+            }
+        });
+    }
+
+    onMarkerSelect(id) {
+        const note = this.props.notes.find(note => note.id === id);
+        this.setState({
+            isEditorOpen: true,
+            note
         });
     }
 
     onCancel() {
         this.setState({
-            isEditorOpen: false
+            isEditorOpen: false,
+            selectedMarker: null
         });
+        // reset zoom
     }
 
     onSave(note) {
@@ -65,15 +84,22 @@ class MainView extends React.Component {
     }
 
     render() {
-        const {isEditorOpen} = this.state;
+        const {isEditorOpen, note, selectedMarker} = this.state;
+        const {notes} = this.props;
         return (
             <Wrapper>
-                <MarkerMap onNewMarker={this.onNewMarker.bind(this)} />
+                <MarkerMap
+                    onMapClick={this.onMapClick.bind(this)}
+                    onMarkerSelect={this.onMarkerSelect.bind(this)}
+                    selectedMarker={selectedMarker}
+                    notes={notes}
+                />
                 {isEditorOpen && (
                     <Floater>
                         <TextEditor
                             onCancel={this.onCancel.bind(this)}
                             onSave={this.onSave.bind(this)}
+                            note={note}
                         />
                     </Floater>
                 )}
@@ -82,4 +108,19 @@ class MainView extends React.Component {
     }
 }
 
-export default MainView;
+const mapStateToProps = state => {
+    const selectedMap = state.maps.selectedMap;
+    return {
+        selectedMap,
+        notes: get(state.notes, [get(selectedMap, 'id'), 'notes'])
+    };
+};
+
+const mapDispatchToProps = dispatch => ({
+    fetchMapsAndSelectFirst: () => dispatch(fetchMaps())
+});
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(MainView);

@@ -4,7 +4,7 @@ import MailIcon from 'react-feather/dist/icons/mail';
 import LockIcon from 'react-feather/dist/icons/lock';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {loginWithEmailAndPassword} from '~/store/actions';
+import {loginWithEmailAndPassword} from '~/store/actions/auth';
 
 class LoginForm extends React.Component {
     constructor() {

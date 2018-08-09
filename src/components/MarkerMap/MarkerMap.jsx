@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Map, TileLayer, Marker} from 'react-leaflet';
-import random from 'lodash/random';
 
 // https://www.npmjs.com/package/react-leaflet-div-icon
 // https://www.npmjs.com/package/react-leaflet-locate-control
@@ -13,41 +12,72 @@ import random from 'lodash/random';
 class MarkerMap extends React.Component {
     constructor(props) {
         super(props);
-        const {markers} = props;
-        const marker = markers[random(0, markers.length - 1)];
         this.state = {
-            position: marker ? marker.position : [0, 0],
+            position: [0, 0],
             zoom: 3
         };
         this.mapRef = React.createRef();
     }
 
-    // TODO: normalize lat, lng for super-far-away map clicks
-    // may need to set maxBounds
+    // TODO: normalize lat, lng for super-far-away map clicks -- may need to set maxBounds
     onClick(e) {
         const {lat, lng} = e.latlng;
         const position = [lat, lng];
-        this.setState({
-            position,
-            zoom: 7,
-            newMarker: this.createMarker(position)
-        });
+        // this.setState({
+        //     position,
+        //     zoom: 7,
+        //     newMarker: this.createMarker(position)
+        // });
 
-        this.props.onNewMarker(position);
+        this.props.onMapClick(position);
     }
 
-    createMarker(position) {
-        return <Marker position={position} />;
+    onMarkerClick(id) {
+        this.props.onMarkerSelect(id);
+    }
+
+    createMarker(position, id) {
+        return id ? (
+            <Marker
+                key={id}
+                position={position}
+                onClick={this.onMarkerClick.bind(this, id)}
+            />
+        ) : (
+            <Marker key={id} position={location} />
+        );
+    }
+
+    convertNotesToMarkers(notes) {
+        return notes.map(note => {
+            // value: `[${value.latitude}, ${value.longitude}]`
+            const {latitude, longitude} = note.location;
+            const position = [latitude, longitude];
+            return this.createMarker(position, note.id);
+        });
+    }
+
+    getPosition(position, selectedMarker) {
+        if (selectedMarker) {
+            return selectedMarker.location;
+        }
+        return position;
     }
 
     render() {
-        const {position, zoom, newMarker} = this.state;
-        const {markers} = this.props;
+        const {position, zoom} = this.state;
+        const {selectedMarker} = this.props;
+
+        const focusedMarker = selectedMarker
+            ? this.createMarker(selectedMarker.location, 'new-marker')
+            : null;
+
+        const markers = this.convertNotesToMarkers(this.props.notes);
         return (
             <Map
                 style={{height: '100%', width: '100%'}}
-                center={position}
-                zoom={zoom}
+                center={selectedMarker ? selectedMarker.location : position}
+                zoom={selectedMarker ? 8 : zoom}
                 worldCopyJump={true}
                 ref={this.mapRef}
                 onClick={this.onClick.bind(this)}
@@ -56,7 +86,7 @@ class MarkerMap extends React.Component {
                     attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                {newMarker}
+                {focusedMarker}
                 {markers}
             </Map>
         );
@@ -64,14 +94,18 @@ class MarkerMap extends React.Component {
 }
 
 MarkerMap.propTypes = {
-    markers: PropTypes.arrayOf(PropTypes.object),
-    onNewMarker: PropTypes.func
+    notes: PropTypes.arrayOf(PropTypes.object),
+    selectedMarker: PropTypes.object,
+    onMapClick: PropTypes.func,
+    onMarkerSelect: PropTypes.func
     // onClick: PropTypes.func
 };
 
+const noop = () => {};
 MarkerMap.defaultProps = {
-    markers: [],
-    onNewMarker: () => {}
+    notes: [],
+    onMapClick: noop,
+    onMarkerSelect: noop
     // onClick: () => {}
 };
 

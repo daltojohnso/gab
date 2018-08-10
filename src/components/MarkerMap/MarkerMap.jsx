@@ -16,20 +16,18 @@ class MarkerMap extends React.Component {
             position: [0, 0],
             zoom: 3
         };
+
         this.mapRef = React.createRef();
     }
 
-    // TODO: normalize lat, lng for super-far-away map clicks -- may need to set maxBounds
+    // TODO: normalize lat, lng for super-far-away map clicks
     onClick(e) {
         const {lat, lng} = e.latlng;
         const position = [lat, lng];
-        // this.setState({
-        //     position,
-        //     zoom: 7,
-        //     newMarker: this.createMarker(position)
-        // });
-
         this.props.onMapClick(position);
+        this.setState({
+            position
+        });
     }
 
     onMarkerClick(id) {
@@ -50,43 +48,42 @@ class MarkerMap extends React.Component {
 
     convertNotesToMarkers(notes) {
         return notes.map(note => {
-            // value: `[${value.latitude}, ${value.longitude}]`
             const {latitude, longitude} = note.location;
-            const position = [latitude, longitude];
-            return this.createMarker(position, note.id);
+            return this.createMarker([latitude, longitude], note.id);
         });
     }
 
-    getPosition(position, selectedMarker) {
-        if (selectedMarker) {
-            return selectedMarker.location;
-        }
-        return position;
+    onViewportChange({zoom}) {
+        this.setState({
+            zoom
+        });
     }
 
     render() {
         const {position, zoom} = this.state;
-        const {selectedMarker} = this.props;
+        const {newNote} = this.props;
 
-        const focusedMarker = selectedMarker
-            ? this.createMarker(selectedMarker.location, 'new-marker')
+        const newNoteMarker = newNote
+            ? this.createMarker(newNote.location, 'new-note')
             : null;
 
         const markers = this.convertNotesToMarkers(this.props.notes);
         return (
             <Map
+                animate={true}
                 style={{height: '100%', width: '100%'}}
-                center={selectedMarker ? selectedMarker.location : position}
+                center={position}
                 zoom={zoom}
                 worldCopyJump={true}
                 ref={this.mapRef}
+                onViewportChange={this.onViewportChange.bind(this)}
                 onClick={this.onClick.bind(this)}
             >
                 <TileLayer
                     attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                {focusedMarker}
+                {newNoteMarker}
                 {markers}
             </Map>
         );
@@ -95,10 +92,10 @@ class MarkerMap extends React.Component {
 
 MarkerMap.propTypes = {
     notes: PropTypes.arrayOf(PropTypes.object),
-    selectedMarker: PropTypes.object,
+    newNote: PropTypes.object,
     onMapClick: PropTypes.func,
-    onMarkerSelect: PropTypes.func
-    // onClick: PropTypes.func
+    onMarkerSelect: PropTypes.func,
+    position: PropTypes.array
 };
 
 const noop = () => {};
@@ -106,7 +103,6 @@ MarkerMap.defaultProps = {
     notes: [],
     onMapClick: noop,
     onMarkerSelect: noop
-    // onClick: () => {}
 };
 
 export default MarkerMap;

@@ -1,6 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {fetchMaps} from '~/store/actions/maps';
+import PropTypes from 'prop-types';
 import {MarkerMap, TextEditor} from '~/components';
 import styled from 'styled-components';
 import get from 'lodash/get';
@@ -41,7 +42,7 @@ class MainView extends React.Component {
         super();
         this.state = {
             isEditorOpen: false,
-            selectedMarker: null,
+            newNote: null,
             note: null
         };
     }
@@ -54,7 +55,7 @@ class MainView extends React.Component {
         this.setState({
             isEditorOpen: true,
             note: null,
-            selectedMarker: {
+            newNote: {
                 location
             }
         });
@@ -65,14 +66,15 @@ class MainView extends React.Component {
         this.setState({
             isEditorOpen: true,
             note,
-            selectedMarker: null
+            newNote: null
         });
     }
 
     onCancel() {
         this.setState({
             isEditorOpen: false,
-            selectedMarker: null
+            newNote: null,
+            note: null
         });
         // reset zoom
     }
@@ -85,14 +87,17 @@ class MainView extends React.Component {
     }
 
     render() {
-        const {isEditorOpen, note, selectedMarker} = this.state;
+        const {isEditorOpen, note, newNote} = this.state;
         const {notes} = this.props;
+        const {latitude, longitude} = note ? note.location : {};
+        const position = note ? [latitude, longitude] : null;
+
         return (
             <Wrapper>
                 <MarkerMap
                     onMapClick={this.onMapClick.bind(this)}
                     onMarkerSelect={this.onMarkerSelect.bind(this)}
-                    selectedMarker={selectedMarker}
+                    newNote={newNote}
                     notes={notes}
                 />
                 {isEditorOpen && (
@@ -101,12 +106,18 @@ class MainView extends React.Component {
                             onCancel={this.onCancel.bind(this)}
                             onSave={this.onSave.bind(this)}
                             note={note}
+                            position={position}
                         />
                     </Floater>
                 )}
             </Wrapper>
         );
     }
+}
+
+MainView.propTypes = {
+    selectedMap: PropTypes.string,
+    notes: PropTypes.array
 }
 
 const mapStateToProps = state => {

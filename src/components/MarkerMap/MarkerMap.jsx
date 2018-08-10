@@ -54,9 +54,7 @@ class MarkerMap extends React.Component {
     }
 
     onViewportChange({zoom}) {
-        this.setState({
-            zoom
-        });
+        this.setState({zoom});
     }
 
     render() {

@@ -1,6 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {fetchMaps} from '~/store/actions/maps';
+import {saveNote} from '~/store/actions/notes';
 import PropTypes from 'prop-types';
 import {MarkerMap, TextEditor} from '~/components';
 import styled from 'styled-components';
@@ -80,9 +81,17 @@ class MainView extends React.Component {
     }
 
     onSave(note) {
-        // dispatch action to save Note
+        const {rawMessage, message} = note;
+        const [latitude, longitude] = this.state.newNote.location;
+        this.props.saveNote(this.props.selectedMap.id, {
+            message,
+            rawMessage,
+            location: {latitude, longitude}
+        });
         this.setState({
-            isEditorOpen: false
+            isEditorOpen: false,
+            newNote: null,
+            note: null
         });
     }
 
@@ -116,9 +125,9 @@ class MainView extends React.Component {
 }
 
 MainView.propTypes = {
-    selectedMap: PropTypes.string,
+    selectedMap: PropTypes.object,
     notes: PropTypes.array
-}
+};
 
 const mapStateToProps = state => {
     const selectedMap = state.maps.selectedMap;
@@ -129,7 +138,8 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = dispatch => ({
-    fetchMapsAndSelectFirst: () => dispatch(fetchMaps())
+    fetchMapsAndSelectFirst: () => dispatch(fetchMaps()),
+    saveNote: (map, note) => dispatch(saveNote(map, note))
 });
 
 export default connect(

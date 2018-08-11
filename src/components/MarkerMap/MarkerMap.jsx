@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Map, TileLayer, Marker} from 'react-leaflet';
 import {bindAll} from '~/util';
+import {GeoPoint} from '~/firebase';
 // https://www.npmjs.com/package/react-leaflet-div-icon
 // https://www.npmjs.com/package/react-leaflet-locate-control
 // https://yuzhva.github.io/react-leaflet-markercluster/
@@ -25,33 +26,30 @@ class MarkerMap extends React.Component {
     onClick(e) {
         const {lat, lng} = e.latlng;
         const position = [lat, lng];
-        this.props.onMapClick(position);
+        this.props.onMapClick(new GeoPoint(...position));
         this.setState({
             position
         });
     }
 
-    onMarkerClick(id) {
+    onMarkerClick(id, position) {
         this.props.onMarkerSelect(id);
+        this.setState({position});
     }
 
-    createMarker(position, id) {
-        return id ? (
+    createMarker(note, fakeId) {
+        const {
+            id,
+            location: {latitude, longitude}
+        } = note;
+        const position = [latitude, longitude];
+        return (
             <Marker
-                key={id}
+                key={id || fakeId}
                 position={position}
-                onClick={this.onMarkerClick.bind(this, id)}
+                onClick={() => this.onMarkerClick(id, position)}
             />
-        ) : (
-            <Marker key={id} position={location} />
         );
-    }
-
-    convertNotesToMarkers(notes) {
-        return notes.map(note => {
-            const {latitude, longitude} = note.location;
-            return this.createMarker([latitude, longitude], note.id);
-        });
     }
 
     onViewportChange({zoom}) {
@@ -60,14 +58,16 @@ class MarkerMap extends React.Component {
 
     render() {
         const {position, zoom} = this.state;
-        const {newNote} = this.props;
+        const {selectedNote, notes} = this.props;
 
-        const newNoteMarker = newNote
-            ? this.createMarker(newNote.location, 'new-note')
-            : null;
+        const pendingMarker =
+            selectedNote && !selectedNote.id
+                ? this.createMarker(selectedNote, 'pending-marker')
+                : null;
 
-        const markers = this.convertNotesToMarkers(this.props.notes);
+        const markers = notes.map(note => this.createMarker(note));
         return (
+            // no -- you can't use styled(Map).
             <Map
                 animate={true}
                 style={{height: '100%', width: '100%'}}
@@ -82,7 +82,7 @@ class MarkerMap extends React.Component {
                     attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                {newNoteMarker}
+                {pendingMarker}
                 {markers}
             </Map>
         );
@@ -91,7 +91,7 @@ class MarkerMap extends React.Component {
 
 MarkerMap.propTypes = {
     notes: PropTypes.arrayOf(PropTypes.object),
-    newNote: PropTypes.object,
+    selectedNote: PropTypes.object,
     onMapClick: PropTypes.func,
     onMarkerSelect: PropTypes.func,
     position: PropTypes.array

@@ -1,7 +1,6 @@
-import firebase from 'firebase/app';
 import {db} from '~/firebase';
+import {nowTimestamp} from '~/util';
 import get from 'lodash/get';
-const {GeoPoint, TimeStamp} = firebase.firestore;
 const pathToUid = ['auth', 'user', 'uid'];
 
 export const fetchNotes = mapId => {
@@ -21,26 +20,20 @@ export const fetchNotes = mapId => {
 };
 
 export const saveNote = (mapId, note) => {
-    return note.id ? addNote(mapId, note) : updateNote(note);
+    return !note.id ? addNote(mapId, note) : updateNote(note);
 };
 
 export const addNote = (mapId, note) => {
     return (dispatch, getState) => {
         const state = getState();
         const uid = get(state, pathToUid);
-        const {
-            location: {latitude, longitude},
-            message,
-            rawMessage
-        } = note;
-        const location = new GeoPoint(latitude, longitude);
-        const createdAt = new TimeStamp(Date.now());
+        const {location, message, rawMessage} = note;
         const newNote = {
-            createdAt,
+            createdAt: nowTimestamp(),
             createdBy: uid,
             location,
             message,
-            rawMessage: JSON.stringify(rawMessage),
+            rawMessage,
             mapId
         };
 
@@ -59,7 +52,7 @@ export const updateNote = note => {
         const uid = get(state, pathToUid);
         const updatedNote = {
             ...note,
-            updatedAt: new TimeStamp(Date.now()),
+            updatedAt: nowTimestamp(),
             updatedBy: uid
         };
         db.collection('notes')

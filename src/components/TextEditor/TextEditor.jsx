@@ -21,7 +21,7 @@ function getEditorState(note) {
     let contentState;
     if (note) {
         try {
-            contentState = convertFromRaw(JSON.parse(note.rawMessage));
+            contentState = convertFromRaw(note.rawMessage);
         } catch (err) {
             contentState = ContentState.createFromText(note.message || '');
         }

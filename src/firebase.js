@@ -27,3 +27,6 @@ firebase.auth().onAuthStateChanged(user => {
     store.dispatch({type: 'auth/userChanged', user: currentUser});
     store.dispatch({type: 'auth/isReady'});
 });
+
+export const GeoPoint = firebase.firestore.GeoPoint;
+export const Timestamp = firebase.firestore.Timestamp;

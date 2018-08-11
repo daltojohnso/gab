@@ -1,3 +1,4 @@
+import {Timestamp} from '~/firebase';
 import isArray from 'lodash/isArray';
 import isPlainObject from 'lodash/isPlainObject';
 import toPairs from 'lodash/toPairs';
@@ -19,4 +20,8 @@ export function bindAll(_this, fns = []) {
             _this[fn] = _this[fn].bind(_this);
         }
     });
+}
+
+export function nowTimestamp() {
+    return new Timestamp((Date.now() / 1000) | 0);
 }

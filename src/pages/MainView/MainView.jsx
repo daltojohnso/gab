@@ -45,8 +45,7 @@ class MainView extends React.Component {
         super();
         this.state = {
             isEditorOpen: false,
-            newNote: null,
-            note: null
+            selectedNote: null
         };
 
         bindAll(this, ['onMapClick', 'onMarkerSelect', 'onCancel', 'onSave']);
@@ -59,8 +58,7 @@ class MainView extends React.Component {
     onMapClick(location) {
         this.setState({
             isEditorOpen: true,
-            note: null,
-            newNote: {
+            selectedNote: {
                 location
             }
         });
@@ -70,47 +68,44 @@ class MainView extends React.Component {
         const note = this.props.notes.find(note => note.id === id);
         this.setState({
             isEditorOpen: true,
-            note,
-            newNote: null
+            selectedNote: note
         });
     }
 
     onCancel() {
         this.setState({
             isEditorOpen: false,
-            newNote: null,
-            note: null
+            selectedNote: null
         });
-        // reset zoom
     }
 
-    onSave(note) {
-        const {rawMessage, message} = note;
-        const [latitude, longitude] = this.state.newNote.location;
-        this.props.saveNote(this.props.selectedMap.id, {
+    onSave({message, rawMessage}) {
+        const {selectedNote} = this.state;
+
+        this.props.saveNote(this.props.selectedMapId, {
+            ...selectedNote,
             message,
             rawMessage,
-            location: {latitude, longitude}
+            location: selectedNote.location
         });
+
         this.setState({
             isEditorOpen: false,
-            newNote: null,
+            selectedNote: null,
             note: null
         });
     }
 
     render() {
-        const {isEditorOpen, note, newNote} = this.state;
+        const {isEditorOpen, selectedNote} = this.state;
         const {notes} = this.props;
-        const {latitude, longitude} = note ? note.location : {};
-        const position = note ? [latitude, longitude] : null;
 
         return (
             <Wrapper>
                 <MarkerMap
                     onMapClick={this.onMapClick}
                     onMarkerSelect={this.onMarkerSelect}
-                    newNote={newNote}
+                    selectedNote={selectedNote}
                     notes={notes}
                 />
                 {isEditorOpen && (
@@ -118,8 +113,7 @@ class MainView extends React.Component {
                         <TextEditor
                             onCancel={this.onCancel}
                             onSave={this.onSave}
-                            note={note}
-                            position={position}
+                            note={selectedNote}
                         />
                     </Floater>
                 )}
@@ -129,7 +123,7 @@ class MainView extends React.Component {
 }
 
 MainView.propTypes = {
-    selectedMap: PropTypes.object,
+    selectedMapId: PropTypes.string,
     notes: PropTypes.array,
     saveNote: PropTypes.func
 };

@@ -1,24 +1,24 @@
-import get from 'lodash/get';
-// import keyBy from 'lodash/keyBy';
+import keyBy from 'lodash/keyBy';
 
 const initState = {
-    maps: null,
-    selectedMap: null
+    byId: {},
+    selectedMapId: null
 };
 
 const maps = (state = initState, action) => {
-    let map;
     switch (action.type) {
-        case 'maps/setMaps':
+        case 'maps/setSubset':
             return {
                 ...state,
-                maps: action.maps
+                byId: {
+                    ...state.byId,
+                    ...keyBy(action.maps, 'id')
+                }
             };
-        case 'maps/selectMap':
-            map = get(state.maps, ['0']);
+        case 'maps/setSelectedMap':
             return {
                 ...state,
-                selectedMap: map
+                selectedMapId: action.selectedMapId
             };
         default:
             return state;

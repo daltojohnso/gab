@@ -1,28 +1,47 @@
-const initState = {};
+import keyBy from 'lodash/keyBy';
+const initState = {
+    byId: {}
+};
 const notes = (state = initState, action) => {
-    let map, notes;
+    let noteId;
     switch (action.type) {
-        case 'notes/setNotes':
-            map = state[action.mapId];
+        // will I ever need this?
+        // clobber the entire store of notes
+        // with, presumably, "all" notes, but
+        // what is "all" when notes can be shared?
+        case 'notes/setAll':
             return {
                 ...state,
-                [action.mapId]: {
-                    ...map,
-                    notes: action.notes
-                    // worth it to convert to map?
-                    // most scenarios right now I just need the list
-                    // notes: keyBy(action.notes, 'id')
+                byId: keyBy(action.notes, 'id')
+            };
+        case 'notes/addSubset':
+            return {
+                ...state,
+                byId: {
+                    ...state.byId,
+                    ...keyBy(action.notes, 'id')
                 }
             };
-        case 'notes/setNote':
-            map = state[action.mapId];
-            notes = map.notes.concat(action.note);
+        case 'notes/set':
+            noteId = action.note.id;
             return {
                 ...state,
-                [action.mapId]: {
-                    ...map,
-                    notes
+                byId: {
+                    ...state.byId,
+                    [noteId]:
+                        noteId in state.byId
+                            ? {
+                                ...state.byId[noteId],
+                                ...action.note
+                            }
+                            : action.note
                 }
+            };
+        case 'notes/remove':
+            noteId = action.noteId;
+            delete state.byId[noteId];
+            return {
+                ...state
             };
         default:
             return state;

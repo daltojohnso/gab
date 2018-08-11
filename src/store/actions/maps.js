@@ -14,24 +14,25 @@ export const fetchMaps = () => {
             .where(sharedWithUid, '==', true)
             .get()
             .then(snapshot => {
-                dispatch(setMaps(snapshot.docs));
-                dispatch(selectMap());
-                const mapId = get(getState(), ['maps', 'selectedMap', 'id']);
-                dispatch(fetchNotes(mapId));
-                return snapshot;
+                const maps = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    data.id = doc.id;
+                    return data;
+                });
+                dispatch(setMaps(maps));
+                const selectedMapId = get(maps, ['0', 'id']);
+                dispatch(setSelectedMap(selectedMapId));
+                dispatch(fetchNotes(selectedMapId));
             });
     };
 };
 
-export const setMaps = mapDocs => ({
+export const setMaps = maps => ({
     type: 'maps/setMaps',
-    maps: mapDocs.map(doc => {
-        const data = doc.data();
-        data.id = doc.id;
-        return data;
-    })
+    maps
 });
 
-export const selectMap = () => ({
-    type: 'maps/selectMap'
+export const setSelectedMap = selectedMapId => ({
+    type: 'maps/setSelectedMap',
+    selectedMapId
 });

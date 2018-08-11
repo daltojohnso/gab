@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Map, TileLayer, Marker} from 'react-leaflet';
-
+import {bindAll} from '~/util';
 // https://www.npmjs.com/package/react-leaflet-div-icon
 // https://www.npmjs.com/package/react-leaflet-locate-control
 // https://yuzhva.github.io/react-leaflet-markercluster/
@@ -18,6 +18,7 @@ class MarkerMap extends React.Component {
         };
 
         this.mapRef = React.createRef();
+        bindAll(this, ['onViewportChange', 'onClick']);
     }
 
     // TODO: normalize lat, lng for super-far-away map clicks
@@ -74,8 +75,8 @@ class MarkerMap extends React.Component {
                 zoom={zoom}
                 worldCopyJump={true}
                 ref={this.mapRef}
-                onViewportChange={this.onViewportChange.bind(this)}
-                onClick={this.onClick.bind(this)}
+                onViewportChange={this.onViewportChange}
+                onClick={this.onClick}
             >
                 <TileLayer
                     attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"

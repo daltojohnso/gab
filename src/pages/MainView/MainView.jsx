@@ -5,7 +5,9 @@ import {saveNote} from '~/store/actions/notes';
 import PropTypes from 'prop-types';
 import {MarkerMap, TextEditor} from '~/components';
 import styled from 'styled-components';
-import get from 'lodash/get';
+import filter from 'lodash/filter';
+import values from 'lodash/values';
+import {bindAll} from '~/util';
 
 const Wrapper = styled.div`
     height: 100%;
@@ -46,6 +48,8 @@ class MainView extends React.Component {
             newNote: null,
             note: null
         };
+
+        bindAll(this, ['onMapClick', 'onMarkerSelect', 'onCancel', 'onSave']);
     }
 
     componentDidMount() {
@@ -104,16 +108,16 @@ class MainView extends React.Component {
         return (
             <Wrapper>
                 <MarkerMap
-                    onMapClick={this.onMapClick.bind(this)}
-                    onMarkerSelect={this.onMarkerSelect.bind(this)}
+                    onMapClick={this.onMapClick}
+                    onMarkerSelect={this.onMarkerSelect}
                     newNote={newNote}
                     notes={notes}
                 />
                 {isEditorOpen && (
                     <Floater>
                         <TextEditor
-                            onCancel={this.onCancel.bind(this)}
-                            onSave={this.onSave.bind(this)}
+                            onCancel={this.onCancel}
+                            onSave={this.onSave}
                             note={note}
                             position={position}
                         />
@@ -126,20 +130,21 @@ class MainView extends React.Component {
 
 MainView.propTypes = {
     selectedMap: PropTypes.object,
-    notes: PropTypes.array
+    notes: PropTypes.array,
+    saveNote: PropTypes.func
 };
 
 const mapStateToProps = state => {
-    const selectedMap = state.maps.selectedMap;
+    const selectedMapId = state.maps.selectedMapId;
     return {
-        selectedMap,
-        notes: get(state.notes, [get(selectedMap, 'id'), 'notes'])
+        selectedMapId,
+        notes: filter(values(state.notes.byId), {mapId: selectedMapId})
     };
 };
 
 const mapDispatchToProps = dispatch => ({
     fetchMapsAndSelectFirst: () => dispatch(fetchMaps()),
-    saveNote: (map, note) => dispatch(saveNote(map, note))
+    saveNote: (mapId, note) => dispatch(saveNote(mapId, note))
 });
 
 export default connect(

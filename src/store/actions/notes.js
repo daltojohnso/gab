@@ -1,56 +1,99 @@
 import firebase from 'firebase/app';
 import {db} from '~/firebase';
 import get from 'lodash/get';
+const {GeoPoint, TimeStamp} = firebase.firestore;
+const pathToUid = ['auth', 'user', 'uid'];
 
 export const fetchNotes = mapId => {
-    // eventually, dispatch loading state for `mapId`
     return dispatch => {
         db.collection('notes')
             .where('mapId', '==', mapId)
             .get()
             .then(notesSnapshot => {
-                dispatch(setNotes(mapId, notesSnapshot.docs));
+                const notes = notesSnapshot.docs.map(doc => {
+                    const data = doc.data();
+                    data.id = doc.id;
+                    return data;
+                });
+                dispatch(addSubsetOfNotes(notes));
             });
     };
 };
 
 export const saveNote = (mapId, note) => {
+    return note.id ? addNote(mapId, note) : updateNote(note);
+};
+
+export const addNote = (mapId, note) => {
     return (dispatch, getState) => {
         const state = getState();
-        const uid = get(state, ['auth', 'user', 'uid']);
-        const {location: {latitude, longitude}, message, rawMessage} = note;
-        const location = new firebase.firestore.GeoPoint(latitude, longitude);
+        const uid = get(state, pathToUid);
+        const {
+            location: {latitude, longitude},
+            message,
+            rawMessage
+        } = note;
+        const location = new GeoPoint(latitude, longitude);
+        const createdAt = new TimeStamp(Date.now());
         const newNote = {
-            createdAt: Date.now(),
+            createdAt,
             createdBy: uid,
             location,
             message,
             rawMessage: JSON.stringify(rawMessage),
             mapId
         };
+
         db.collection('notes')
             .add(newNote)
             .then(doc => {
                 newNote.id = doc.id;
-                dispatch(setNote(mapId, newNote));
+                dispatch(setNote(newNote));
             });
     };
 };
 
-export const setNotes = (mapId, noteDocs) => ({
-    type: 'notes/setNotes',
-    mapId,
-    notes: noteDocs.map(doc => {
-        const data = doc.data();
-        data.id = doc.id;
-        return data;
-    })
+export const updateNote = note => {
+    return (dispatch, getState) => {
+        const state = getState();
+        const uid = get(state, pathToUid);
+        const updatedNote = {
+            ...note,
+            updatedAt: new TimeStamp(Date.now()),
+            updatedBy: uid
+        };
+        db.collection('notes')
+            .doc(note.id)
+            .update(updatedNote)
+            .then(() => {
+                dispatch(setNote(updatedNote));
+            });
+    };
+};
+
+export const deleteNote = noteId => {
+    return dispatch => {
+        db.collection('notes')
+            .doc(noteId)
+            .then(() => {
+                dispatch(removeNote(noteId));
+            });
+    };
+};
+
+export const addSubsetOfNotes = notes => ({
+    type: 'notes/addSubset',
+    notes
 });
 
-export const setNote = (mapId, note) => {
+export const setNote = note => {
     return {
-        type: 'notes/setNote',
-        mapId,
+        type: 'notes/set',
         note
     };
 };
+
+export const removeNote = noteId => ({
+    type: 'notes/remove',
+    noteId
+});

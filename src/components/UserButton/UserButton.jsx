@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import UserIcon from 'react-feather/dist/icons/user';
 import styled from 'styled-components';
+import {bindAll} from '~/util';
 
 const DropdownTrigger = styled.div`
     height: 28px;
@@ -24,9 +25,11 @@ class UserButton extends React.Component {
         this.state = {
             isActive: false
         };
+
+        bindAll(this, ['onToggle', {onSignOut: 'props.onSignOut'}]);
     }
 
-    toggle() {
+    onToggle() {
         this.setState(prevState => ({
             isActive: !prevState.isActive
         }));
@@ -35,9 +38,9 @@ class UserButton extends React.Component {
     render() {
         const {isActive} = this.state;
         const {
-            user: {displayName, email},
-            onSignOut
+            user: {displayName, email}
         } = this.props;
+
         return (
             <div className={classNames(this.props.className)}>
                 <div
@@ -45,7 +48,7 @@ class UserButton extends React.Component {
                         'is-active': isActive
                     })}
                     tabIndex="0"
-                    onClick={() => this.toggle()}
+                    onClick={this.onToggle}
                 >
                     <DropdownTrigger className="dropdown-trigger">
                         <StyledUserIcon />
@@ -59,7 +62,7 @@ class UserButton extends React.Component {
                             <a
                                 className="dropdown-item"
                                 tabIndex="0"
-                                onClick={() => onSignOut()}
+                                onClick={this.onSignOut}
                             >
                                 Sign out
                             </a>

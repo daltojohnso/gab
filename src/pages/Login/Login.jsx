@@ -5,6 +5,7 @@ import LockIcon from 'react-feather/dist/icons/lock';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {loginWithEmailAndPassword} from '~/store/actions/auth';
+import {bindAll} from '~/util';
 
 class LoginForm extends React.Component {
     constructor() {
@@ -13,6 +14,14 @@ class LoginForm extends React.Component {
             email: '',
             password: ''
         };
+
+        bindAll(this, [
+            'onSubmit',
+            {
+                onEmailChange: ['onChange', 'email'],
+                onPasswordChange: ['onChange', 'password']
+            }
+        ]);
     }
 
     onSubmit(e) {
@@ -28,7 +37,7 @@ class LoginForm extends React.Component {
 
     render() {
         return (
-            <form onSubmit={e => this.onSubmit(e)}>
+            <form onSubmit={this.onSubmit}>
                 <div className="field">
                     <p className="control has-icons-left has-icons-right">
                         <input
@@ -36,7 +45,7 @@ class LoginForm extends React.Component {
                             type="email"
                             placeholder="Email"
                             value={this.state.email}
-                            onChange={this.onChange.bind(this, 'email')}
+                            onChange={this.onEmailChange}
                         />
                         <span className="icon is-small is-left">
                             <MailIcon />
@@ -50,7 +59,7 @@ class LoginForm extends React.Component {
                             type="password"
                             placeholder="Password"
                             value={this.state.password}
-                            onChange={this.onChange.bind(this, 'password')}
+                            onChange={this.onPasswordChange}
                         />
                         <span className="icon is-small is-left">
                             <LockIcon />

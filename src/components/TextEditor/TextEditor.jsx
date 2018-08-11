@@ -15,6 +15,7 @@ import {FooterItem, Card, CardContent, OnIcon} from './Components.jsx';
 import get from 'lodash/get';
 import isEqual from 'lodash/isEqual';
 import isBoolean from 'lodash/isBoolean';
+import {bindAll} from '~/util';
 
 function getEditorState(note) {
     let contentState;
@@ -83,8 +84,27 @@ class TextEditor extends React.Component {
                 footer: hoverCloseButton
             }
         };
+
+        bindAll(this, [
+            'onChange',
+            'handleKeyCommand',
+            {
+                onEdit: ['onEvent', 'edit'],
+                onClose: ['onEvent', 'close']
+            }
+        ]);
     }
 
+    // TODO: this sucks, do better.
+    // instead of this...
+    // store last event, call fn to generate footer...
+    // main issue was returning to prev state after a hover
+    // I could either ignore hovers when "confirming"
+    // or I could separate hover states entirely
+    // and then I can return to the prev "real" state
+    // "hover" will just sort of sit on top of the real state
+    // maybe have [defaultState, confirmState, potentialHover]
+    // the other issue was doing setTimeout cleanly
     getNewState(type, eventType) {
         const combined = `${type}_${eventType}`;
         this.setState(prevState => {
@@ -157,22 +177,20 @@ class TextEditor extends React.Component {
     render() {
         const {editing, footer, editorState} = this.state;
         const {note} = this.props;
-        const closeProps = editing
-            ? {}
-            : {onClick: () => this.props.onCancel()};
+
         return (
             <Card className="card">
                 <div className="card-header">
                     <p className="card-header-title">
                         <em>{note ? note.title || 'Note' : 'New Note'}</em>
                     </p>
-                    <OnIcon on={this.onEvent.bind(this, 'edit')}>
+                    <OnIcon on={this.onEdit}>
                         <EditIcon />
                     </OnIcon>
 
                     <OnIcon
-                        on={this.onEvent.bind(this, 'close')}
-                        {...closeProps}
+                        on={this.onClose}
+                        {...(editing ? {} : {onClick: this.props.onCancel})}
                     >
                         <XIcon />
                     </OnIcon>
@@ -181,8 +199,8 @@ class TextEditor extends React.Component {
                     <Editor
                         readOnly={!editing}
                         editorState={editorState}
-                        onChange={this.onChange.bind(this)}
-                        handleKeyCommand={this.handleKeyCommand.bind(this)}
+                        onChange={this.onChange}
+                        handleKeyCommand={this.handleKeyCommand}
                     />
                 </CardContent>
                 <footer className="card-footer">{footer}</footer>

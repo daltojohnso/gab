@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {fetchMaps} from '~/store/actions/maps';
-import {saveNote} from '~/store/actions/notes';
+import {saveNote, deleteNote} from '~/store/actions/notes';
 import PropTypes from 'prop-types';
 import {MarkerMap, TextEditor} from '~/components';
 import styled from 'styled-components';
@@ -48,7 +48,13 @@ class MainView extends React.Component {
             selectedNote: null
         };
 
-        bindAll(this, ['onMapClick', 'onMarkerSelect', 'onCancel', 'onSave']);
+        bindAll(this, [
+            'onMapClick',
+            'onMarkerSelect',
+            'onCancel',
+            'onSave',
+            'onDelete'
+        ]);
     }
 
     componentDidMount() {
@@ -91,8 +97,15 @@ class MainView extends React.Component {
 
         this.setState({
             isEditorOpen: false,
-            selectedNote: null,
-            note: null
+            selectedNote: null
+        });
+    }
+
+    onDelete(noteId) {
+        this.props.deleteNote(noteId);
+        this.setState({
+            isEditorOpen: false,
+            selectedNote: null
         });
     }
 
@@ -113,6 +126,7 @@ class MainView extends React.Component {
                         <TextEditor
                             onCancel={this.onCancel}
                             onSave={this.onSave}
+                            onDelete={this.onDelete}
                             note={selectedNote}
                         />
                     </Floater>
@@ -125,7 +139,8 @@ class MainView extends React.Component {
 MainView.propTypes = {
     selectedMapId: PropTypes.string,
     notes: PropTypes.array,
-    saveNote: PropTypes.func
+    saveNote: PropTypes.func,
+    deleteNote: PropTypes.func
 };
 
 const mapStateToProps = state => {
@@ -138,7 +153,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => ({
     fetchMapsAndSelectFirst: () => dispatch(fetchMaps()),
-    saveNote: (mapId, note) => dispatch(saveNote(mapId, note))
+    saveNote: (mapId, note) => dispatch(saveNote(mapId, note)),
+    deleteNote: id => dispatch(deleteNote(id))
 });
 
 export default connect(

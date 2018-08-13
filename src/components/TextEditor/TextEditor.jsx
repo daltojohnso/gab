@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import EditIcon from 'react-feather/dist/icons/edit';
 import XIcon from 'react-feather/dist/icons/x';
+import TrashIcon from 'react-feather/dist/icons/trash-2';
 import {
     Editor,
     EditorState,
@@ -11,10 +12,10 @@ import {
     convertFromRaw
 } from 'draft-js';
 import 'draft-js/dist/Draft.css';
-import {FooterItem, Card, CardContent, OnIcon} from './Components.jsx';
+import {FooterItem, Card, CardContent, Icon} from './Components.jsx';
+import head from 'lodash/head';
+import last from 'lodash/last';
 import get from 'lodash/get';
-import isEqual from 'lodash/isEqual';
-import isBoolean from 'lodash/isBoolean';
 import {bindAll} from '~/util';
 
 function getEditorState(note) {
@@ -35,10 +36,9 @@ function getEditorState(note) {
 const hoverEditButton = <FooterItem>Edit?</FooterItem>;
 const hoverCloseButton = <FooterItem>Close note?</FooterItem>;
 const hoverCancelButton = <FooterItem>Discard changes?</FooterItem>;
-const DefaultFooter = <FooterItem>&nbsp;</FooterItem>;
-const confirmCancel = (
-    <FooterItem>Are you sure you want to discard changes?</FooterItem>
-);
+const hoverDeleteButton = <FooterItem>Delete note?</FooterItem>;
+const defaultFooter = <FooterItem>&nbsp;</FooterItem>;
+
 class TextEditor extends React.Component {
     constructor(props) {
         super(props);
@@ -47,93 +47,43 @@ class TextEditor extends React.Component {
         const editorState = getEditorState(note);
         this.state = {
             editorState,
-            editMode: note ? 'readOnly' : 'edit',
-            buttonMode: 'default',
-            hoverMode: null,
-
-            editing: false,
-            footer: DefaultFooter
+            baseFooter: note && note.id ? ['readOnly'] : ['editing'],
+            hoverLayer: null
         };
 
-        this.saveButton = (
-            <FooterItem link onClick={() => this.onSaveEditorContents()}>
+        const saveButton = (
+            <FooterItem link onClick={() => this.accept('editing')}>
                 Save
             </FooterItem>
         );
 
-        this.editState = {
-            close_onClick: {
-                footer: confirmCancel
-            },
-            close_onMouseOver: {
-                footer: hoverCancelButton
-            }
+        const confirmCancel = (
+            <FooterItem link onClick={() => this.accept('cancel')}>
+                Are you sure you want to discard changes?
+            </FooterItem>
+        );
+
+        const confirmDelete = (
+            <FooterItem link onClick={() => this.accept('delete')}>
+                Are you sure you want to delete this note?
+            </FooterItem>
+        );
+
+        this.baseStates = {
+            readOnly: defaultFooter,
+            editing: saveButton,
+            cancel: confirmCancel,
+            delete: confirmDelete
         };
 
-        this.readOnlyState = {
-            edit_onClick: {
-                editing: true
-            },
-            edit_onMouseOver: {
-                footer: hoverEditButton
-            },
-            close_onClick: {
-                footer: confirmCancel
-            },
-            close_onMouseOver: {
-                footer: hoverCloseButton
-            }
+        this.hoverStates = {
+            editing: hoverEditButton,
+            cancel: hoverCancelButton,
+            close: hoverCloseButton,
+            delete: hoverDeleteButton
         };
 
-        bindAll(this, [
-            'onChange',
-            'handleKeyCommand',
-            {
-                onEdit: ['onEvent', 'edit'],
-                onClose: ['onEvent', 'close']
-            }
-        ]);
-    }
-
-    // TODO: this sucks, do better.
-    // instead of this...
-    // store last event, call fn to generate footer...
-    // main issue was returning to prev state after a hover
-    // I could either ignore hovers when "confirming"
-    // or I could separate hover states entirely
-    // and then I can return to the prev "real" state
-    // "hover" will just sort of sit on top of the real state
-    // maybe have [defaultState, confirmState, potentialHover]
-    // the other issue was doing setTimeout cleanly
-    getNewState(type, eventType) {
-        const combined = `${type}_${eventType}`;
-        this.setState(prevState => {
-            let editing = prevState.editing;
-            const stateToChange = get(
-                editing ? this.editState : this.readOnlyState,
-                combined,
-                {}
-            );
-            editing = isBoolean(stateToChange.editing)
-                ? stateToChange.editing
-                : editing;
-
-            this.handleDoubleClick(prevState.lastState, {type, eventType});
-            return Object.assign({
-                editing,
-                footer: editing ? this.saveButton : DefaultFooter,
-                lastState: {type, eventType},
-                ...stateToChange
-            });
-        });
-    }
-
-    handleDoubleClick(lastType, type) {
-        if (isEqual(lastType, type)) {
-            if (type.type === 'close') {
-                this.props.onCancel();
-            }
-        }
+        bindAll(this, ['onChange', 'handleKeyCommand']);
     }
 
     componentDidUpdate(prevProps) {
@@ -143,13 +93,10 @@ class TextEditor extends React.Component {
 
             this.setState({
                 editorState,
-                editMode: note ? 'readOnly' : 'edit'
+                baseFooter: note && note.id ? ['readOnly'] : ['editing'],
+                hoverLayer: null
             });
         }
-    }
-
-    onEvent(type, eventType) {
-        this.getNewState(type, eventType);
     }
 
     onSaveEditorContents() {
@@ -174,9 +121,81 @@ class TextEditor extends React.Component {
         return 'not-handled';
     }
 
+    start(mode) {
+        this.setState({
+            baseFooter: [mode],
+            hoverLayer: null
+        });
+    }
+
+    confirm(mode) {
+        this.setState(prevState => {
+            const baseMode = head(prevState.baseFooter);
+
+            clearTimeout(this.timeoutId);
+            this.timeoutId = setTimeout(() => {
+                this.setState({
+                    baseFooter: [baseMode]
+                });
+            }, 3000);
+
+            return {
+                baseFooter: [baseMode, mode],
+                hoverLayer: null
+            };
+        });
+    }
+
+    accept(mode) {
+        clearTimeout(this.timeoutId);
+        switch (mode) {
+            case 'editing':
+                this.onSaveEditorContents();
+                break;
+            case 'cancel':
+            case 'close':
+                this.props.onCancel();
+                break;
+            case 'delete':
+                this.props.onDelete(get(this.props, ['note', 'id']));
+                break;
+        }
+    }
+
+    hover(mode) {
+        this.setState(prevState => {
+            return prevState.baseFooter.find(base => base === mode)
+                ? {}
+                : {
+                    hoverLayer: mode
+                };
+        });
+    }
+
+    clearHover(mode) {
+        this.setState(prevState => {
+            return prevState.hoverLayer === mode
+                ? {
+                    hoverLayer: null
+                }
+                : {};
+        });
+    }
+
+    buildFooter(baseFooter, hoverLayer) {
+        const base = last(baseFooter);
+        const footer = hoverLayer
+            ? this.hoverStates[hoverLayer]
+            : this.baseStates[base];
+        return footer || defaultFooter;
+    }
+
     render() {
-        const {editing, footer, editorState} = this.state;
+        const {editorState, baseFooter, hoverLayer} = this.state;
         const {note} = this.props;
+
+        const editing = head(baseFooter) === 'editing';
+        const footer = this.buildFooter(baseFooter, hoverLayer);
 
         return (
             <Card className="card">
@@ -184,16 +203,40 @@ class TextEditor extends React.Component {
                     <p className="card-header-title">
                         <em>{note ? note.title || 'Note' : 'New Note'}</em>
                     </p>
-                    <OnIcon on={this.onEdit}>
-                        <EditIcon />
-                    </OnIcon>
-
-                    <OnIcon
-                        on={this.onClose}
-                        {...(editing ? {} : {onClick: this.props.onCancel})}
+                    <Icon
+                        onClick={() => this.start('editing')}
+                        onMouseOver={() => this.hover('editing')}
+                        onMouseOut={() => this.clearHover('editing')}
                     >
-                        <XIcon />
-                    </OnIcon>
+                        <EditIcon />
+                    </Icon>
+                    {get(note, 'id') && (
+                        <Icon
+                            onClick={() => this.confirm('delete')}
+                            onMouseOver={() => this.hover('delete')}
+                            onMouseOut={() => this.clearHover('delete')}
+                        >
+                            <TrashIcon />
+                        </Icon>
+                    )}
+                    {editing && (
+                        <Icon
+                            onClick={() => this.confirm('cancel')}
+                            onMouseOver={() => this.hover('cancel')}
+                            onMouseOut={() => this.clearHover('cancel')}
+                        >
+                            <XIcon />
+                        </Icon>
+                    )}
+                    {!editing && (
+                        <Icon
+                            onClick={() => this.accept('close')}
+                            onMouseOver={() => this.hover('close')}
+                            onMouseOut={() => this.clearHover('close')}
+                        >
+                            <XIcon />
+                        </Icon>
+                    )}
                 </div>
                 <CardContent className="card-content">
                     <Editor
@@ -213,13 +256,15 @@ TextEditor.propTypes = {
     initialText: PropTypes.string,
     onSave: PropTypes.func,
     onCancel: PropTypes.func,
+    onDelete: PropTypes.func,
     note: PropTypes.object
 };
 
 const noop = () => {};
 TextEditor.defaultProps = {
     onSave: noop,
-    onCancel: noop
+    onCancel: noop,
+    onDelete: noop
 };
 
 export default TextEditor;

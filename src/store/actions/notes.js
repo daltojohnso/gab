@@ -68,6 +68,7 @@ export const deleteNote = noteId => {
     return dispatch => {
         db.collection('notes')
             .doc(noteId)
+            .delete()
             .then(() => {
                 dispatch(removeNote(noteId));
             });

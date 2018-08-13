@@ -26,7 +26,14 @@ class UserButton extends React.Component {
             isActive: false
         };
 
-        bindAll(this, ['onToggle', {onSignOut: 'props.onSignOut'}]);
+        bindAll(this, [
+            'onToggle',
+            'onBlur',
+            'onFocus',
+            'onKeyUpToggle',
+            'onKeyUpSignOut',
+            {onSignOut: 'props.onSignOut'}
+        ]);
     }
 
     onToggle() {
@@ -35,12 +42,46 @@ class UserButton extends React.Component {
         }));
     }
 
+    onBlur() {
+        // lets the next focus event fire
+        setTimeout(() => {
+            this.setState({
+                isActive: false
+            });
+        });
+    }
+
+    onFocus() {
+        // puts the focus event after the state setting in `onBlur`
+        setTimeout(() => {
+            this.setState({
+                isActive: true
+            });
+        });
+    }
+
+    onKeyUpToggle(e) {
+        const key = e.key;
+        this.setState(prevState => {
+            return key === 'Enter'
+                ? {
+                    isActive: !prevState.isActive
+                }
+                : {};
+        });
+    }
+
+    onKeyUpSignOut(e) {
+        if (e.key === 'Enter') {
+            this.props.onSignOut();
+        }
+    }
+
     render() {
         const {isActive} = this.state;
         const {
             user: {displayName, email}
         } = this.props;
-
         return (
             <div className={classNames(this.props.className)}>
                 <div
@@ -49,6 +90,8 @@ class UserButton extends React.Component {
                     })}
                     tabIndex="0"
                     onClick={this.onToggle}
+                    onKeyUp={this.onKeyUpToggle}
+                    onBlur={this.onBlur}
                 >
                     <DropdownTrigger className="dropdown-trigger">
                         <StyledUserIcon />
@@ -63,6 +106,9 @@ class UserButton extends React.Component {
                                 className="dropdown-item"
                                 tabIndex="0"
                                 onClick={this.onSignOut}
+                                onFocus={this.onFocus}
+                                onBlur={this.onBlur}
+                                onKeyUp={this.onKeyUpSignOut}
                             >
                                 Sign out
                             </a>

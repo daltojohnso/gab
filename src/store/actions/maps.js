@@ -2,6 +2,7 @@ import {db} from '~/firebase';
 import get from 'lodash/get';
 import firebase from 'firebase/app';
 import {fetchNotes} from './notes';
+import {fetchUsers} from './users';
 
 const FieldPath = firebase.firestore.FieldPath;
 
@@ -20,8 +21,10 @@ export const fetchMaps = () => {
                     return data;
                 });
                 dispatch(setMaps(maps));
+                const sharedWith = get(maps, ['0', 'sharedWith'], {});
                 const selectedMapId = get(maps, ['0', 'id']);
                 dispatch(setSelectedMap(selectedMapId));
+                dispatch(fetchUsers(Object.keys(sharedWith)));
                 dispatch(fetchNotes(selectedMapId));
             });
     };

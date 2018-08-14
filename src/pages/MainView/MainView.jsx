@@ -65,7 +65,8 @@ class MainView extends React.Component {
         this.setState({
             isEditorOpen: true,
             selectedNote: {
-                location
+                location,
+                createdBy: this.props.user.uid
             }
         });
     }
@@ -111,7 +112,7 @@ class MainView extends React.Component {
 
     render() {
         const {isEditorOpen, selectedNote} = this.state;
-        const {notes} = this.props;
+        const {notes, usersById} = this.props;
 
         return (
             <Wrapper>
@@ -120,6 +121,7 @@ class MainView extends React.Component {
                     onMarkerSelect={this.onMarkerSelect}
                     selectedNote={selectedNote}
                     notes={notes}
+                    usersById={usersById}
                 />
                 {isEditorOpen && (
                     <Floater>
@@ -139,6 +141,7 @@ class MainView extends React.Component {
 MainView.propTypes = {
     selectedMapId: PropTypes.string,
     notes: PropTypes.array,
+    usersById: PropTypes.object,
     saveNote: PropTypes.func,
     deleteNote: PropTypes.func
 };
@@ -147,7 +150,9 @@ const mapStateToProps = state => {
     const selectedMapId = state.maps.selectedMapId;
     return {
         selectedMapId,
-        notes: filter(values(state.notes.byId), {mapId: selectedMapId})
+        notes: filter(values(state.notes.byId), {mapId: selectedMapId}),
+        usersById: state.users.byId,
+        user: state.auth.user
     };
 };
 

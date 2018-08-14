@@ -3,6 +3,38 @@ import PropTypes from 'prop-types';
 import {Map, TileLayer, Marker} from 'react-leaflet';
 import {bindAll} from '~/util';
 import {GeoPoint} from '~/firebase';
+import styled from 'styled-components';
+import values from 'lodash/values';
+
+import L from 'leaflet';
+// const icon = L.divIcon({className: 'marker-map--div-icon'});
+const icon = L.divIcon();
+const MapWrapper = styled.div`
+    height: 100%;
+    width: 100%;
+
+    .marker-map--div-icon {
+        &::before {
+            font-size: 1.5rem;
+            content: '🌚';
+        }
+
+        ${props =>
+        props.users
+                .map(user => {
+                return `
+                            &--${user.uid} {
+                                &::before {
+                                    font-size: 1.5rem;
+                                    content: '${user.icon}';
+                                }
+                            }
+                        `;
+                })
+            .join('\n')};
+    }
+`;
+
 // https://www.npmjs.com/package/react-leaflet-div-icon
 // https://www.npmjs.com/package/react-leaflet-locate-control
 // https://yuzhva.github.io/react-leaflet-markercluster/
@@ -37,14 +69,22 @@ class MarkerMap extends React.Component {
         this.setState({position});
     }
 
-    createMarker(note, fakeId) {
+    createMarker(note, usersById, fakeId) {
         const {
             id,
+            createdBy,
             location: {latitude, longitude}
         } = note;
         const position = [latitude, longitude];
+        const user = usersById[createdBy];
+        const className = user
+            ? `marker-map--div-icon--${user.uid}`
+            : 'marker-map--div-icon';
+
+        const icon = L.divIcon({className});
         return (
             <Marker
+                icon={icon}
                 key={id || fakeId}
                 position={position}
                 onClick={() => this.onMarkerClick(id, position)}
@@ -58,39 +98,42 @@ class MarkerMap extends React.Component {
 
     render() {
         const {position, zoom} = this.state;
-        const {selectedNote, notes} = this.props;
+        const {selectedNote, notes, usersById} = this.props;
 
         const pendingMarker =
             selectedNote && !selectedNote.id
-                ? this.createMarker(selectedNote, 'pending-marker')
+                ? this.createMarker(selectedNote, usersById, 'pending-marker')
                 : null;
 
-        const markers = notes.map(note => this.createMarker(note));
+        const markers = notes.map(note => this.createMarker(note, usersById));
         return (
             // no -- you can't use styled(Map).
-            <Map
-                animate={true}
-                style={{height: '100%', width: '100%'}}
-                center={position}
-                zoom={zoom}
-                worldCopyJump={true}
-                ref={this.mapRef}
-                onViewportChange={this.onViewportChange}
-                onClick={this.onClick}
-            >
-                <TileLayer
-                    attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                {pendingMarker}
-                {markers}
-            </Map>
+            <MapWrapper users={values(usersById)}>
+                <Map
+                    animate={true}
+                    style={{height: '100%', width: '100%'}}
+                    center={position}
+                    zoom={zoom}
+                    worldCopyJump={true}
+                    ref={this.mapRef}
+                    onViewportChange={this.onViewportChange}
+                    onClick={this.onClick}
+                >
+                    <TileLayer
+                        attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    {pendingMarker}
+                    {markers}
+                </Map>
+            </MapWrapper>
         );
     }
 }
 
 MarkerMap.propTypes = {
     notes: PropTypes.arrayOf(PropTypes.object),
+    usersById: PropTypes.object,
     selectedNote: PropTypes.object,
     onMapClick: PropTypes.func,
     onMarkerSelect: PropTypes.func,
@@ -100,6 +143,7 @@ MarkerMap.propTypes = {
 const noop = () => {};
 MarkerMap.defaultProps = {
     notes: [],
+    usersById: {},
     onMapClick: noop,
     onMarkerSelect: noop
 };

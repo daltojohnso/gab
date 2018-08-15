@@ -120,6 +120,17 @@ class TextEditor extends React.Component {
         return 'not-handled';
     }
 
+    tryToClose() {
+        const {editorState} = this.state;
+        const currentContent = editorState.getCurrentContent();
+        const text = currentContent.getPlainText();
+        if (text === get(this.props, ['note', 'message'], '')) {
+            this.props.onCancel();
+        } else {
+            this.confirm('cancel');
+        }
+    }
+
     start(mode) {
         this.setState({
             baseFooter: [mode],
@@ -207,7 +218,11 @@ class TextEditor extends React.Component {
             <Card className="card">
                 <div className="card-header">
                     <p className="card-header-title">
-                        <em>{note ? note.title || 'Note' : 'New Note'}</em>
+                        <em>
+                            {note && note.id
+                                ? note.title || 'Note'
+                                : 'New Note'}
+                        </em>
                     </p>
                     <Icon
                         onClick={() => this.start('editing')}
@@ -227,7 +242,7 @@ class TextEditor extends React.Component {
                     )}
                     {editing && (
                         <Icon
-                            onClick={() => this.confirm('cancel')}
+                            onClick={() => this.tryToClose()}
                             onMouseOver={() => this.hover('cancel')}
                             onMouseOut={() => this.clearHover('cancel')}
                         >

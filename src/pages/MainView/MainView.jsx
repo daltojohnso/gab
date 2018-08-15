@@ -54,7 +54,8 @@ class MainView extends React.Component {
             'onMarkerSelect',
             'onCancel',
             'onSave',
-            'onDelete'
+            'onDelete',
+            'onNewEditorMode'
         ]);
     }
 
@@ -63,16 +64,29 @@ class MainView extends React.Component {
     }
 
     onMapClick(location) {
-        this.setState({
-            isEditorOpen: true,
-            selectedNote: {
-                location,
-                createdBy: this.props.user.uid
-            }
-        });
+        const {selectedNote, isMovingNote, editorMode} = this.state;
+        if (selectedNote && isMovingNote) {
+            this.setState({
+                selectedNote: {
+                    ...selectedNote,
+                    location
+                }
+            });
+        } else if (editorMode !== 'editing') {
+            this.setState({
+                isEditorOpen: true,
+                selectedNote: {
+                    location,
+                    createdBy: this.props.user.uid
+                }
+            });
+        }
     }
 
     onMarkerSelect(id) {
+        const {editorMode} = this.state;
+        if (editorMode === 'editing') return;
+
         const note = this.props.notes.find(note => note.id === id);
         this.setState({
             isEditorOpen: true,
@@ -80,11 +94,14 @@ class MainView extends React.Component {
         });
     }
 
-    onCancel() {
+    onNewEditorMode(mode) {
         this.setState({
-            isEditorOpen: false,
-            selectedNote: null
+            editorMode: mode
         });
+    }
+
+    onCancel() {
+        this.resetEditor();
     }
 
     onSave({message, rawMessage}) {
@@ -97,17 +114,19 @@ class MainView extends React.Component {
             location: selectedNote.location
         });
 
-        this.setState({
-            isEditorOpen: false,
-            selectedNote: null
-        });
+        this.resetEditor();
     }
 
     onDelete(noteId) {
         this.props.deleteNote(noteId);
+        this.resetEditor();
+    }
+
+    resetEditor() {
         this.setState({
             isEditorOpen: false,
-            selectedNote: null
+            selectedNote: null,
+            editorMode: null
         });
     }
 
@@ -130,6 +149,7 @@ class MainView extends React.Component {
                 {isEditorOpen && (
                     <Floater>
                         <TextEditor
+                            onNewMode={this.onNewEditorMode}
                             onCancel={this.onCancel}
                             onSave={this.onSave}
                             onDelete={this.onDelete}

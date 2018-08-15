@@ -82,7 +82,7 @@ class TextEditor extends React.Component {
             delete: hoverDeleteButton
         };
 
-        bindAll(this, ['onChange', 'handleKeyCommand']);
+        bindAll(this, ['onChange', 'onFocus', 'handleKeyCommand']);
     }
 
     componentDidUpdate(prevProps) {
@@ -111,6 +111,11 @@ class TextEditor extends React.Component {
         this.setState({editorState});
     }
 
+    onFocus() {
+        // not ideal, but I want to clobber empty new notes.
+        this.props.onNewMode('editing');
+    }
+
     handleKeyCommand(command, editorState) {
         const newState = RichUtils.handleKeyCommand(editorState, command);
         if (newState) {
@@ -132,6 +137,7 @@ class TextEditor extends React.Component {
     }
 
     start(mode) {
+        this.props.onNewMode(mode);
         this.setState({
             baseFooter: [mode],
             hoverLayer: null
@@ -264,6 +270,7 @@ class TextEditor extends React.Component {
                         readOnly={!editing}
                         editorState={editorState}
                         onChange={this.onChange}
+                        onFocus={this.onFocus}
                         handleKeyCommand={this.handleKeyCommand}
                     />
                 </CardContent>
@@ -275,6 +282,7 @@ class TextEditor extends React.Component {
 
 TextEditor.propTypes = {
     initialText: PropTypes.string,
+    onNewMode: PropTypes.func,
     onSave: PropTypes.func,
     onCancel: PropTypes.func,
     onDelete: PropTypes.func,
@@ -284,6 +292,7 @@ TextEditor.propTypes = {
 
 const noop = () => {};
 TextEditor.defaultProps = {
+    onNewMode: noop,
     onSave: noop,
     onCancel: noop,
     onDelete: noop

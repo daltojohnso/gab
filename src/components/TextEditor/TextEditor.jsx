@@ -37,7 +37,6 @@ const hoverEditButton = <FooterItem>Edit?</FooterItem>;
 const hoverCloseButton = <FooterItem>Close note?</FooterItem>;
 const hoverCancelButton = <FooterItem>Discard changes?</FooterItem>;
 const hoverDeleteButton = <FooterItem>Delete note?</FooterItem>;
-const defaultFooter = <FooterItem>&nbsp;</FooterItem>;
 
 class TextEditor extends React.Component {
     constructor(props) {
@@ -70,7 +69,7 @@ class TextEditor extends React.Component {
         );
 
         this.baseStates = {
-            readOnly: defaultFooter,
+            readOnly: null,
             editing: saveButton,
             cancel: confirmCancel,
             delete: confirmDelete
@@ -187,15 +186,22 @@ class TextEditor extends React.Component {
         const footer = hoverLayer
             ? this.hoverStates[hoverLayer]
             : this.baseStates[base];
-        return footer || defaultFooter;
+        return footer || this.baseStates.readOnly;
     }
 
     render() {
         const {editorState, baseFooter, hoverLayer} = this.state;
-        const {note} = this.props;
+        const {note, createdBy} = this.props;
 
         const editing = head(baseFooter) === 'editing';
-        const footer = this.buildFooter(baseFooter, hoverLayer);
+        const name = get(createdBy, 'displayName') || get(createdBy, 'email');
+        const defaultFooter = name ? (
+            <FooterItem>{name && <i>from {name}</i>}</FooterItem>
+        ) : (
+            <FooterItem>&nbsp;</FooterItem>
+        );
+        const footer =
+            this.buildFooter(baseFooter, hoverLayer) || defaultFooter;
 
         return (
             <Card className="card">
@@ -257,7 +263,8 @@ TextEditor.propTypes = {
     onSave: PropTypes.func,
     onCancel: PropTypes.func,
     onDelete: PropTypes.func,
-    note: PropTypes.object
+    note: PropTypes.object,
+    createdBy: PropTypes.object
 };
 
 const noop = () => {};

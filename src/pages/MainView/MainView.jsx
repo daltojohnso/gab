@@ -7,6 +7,7 @@ import {MarkerMap, TextEditor} from '~/components';
 import styled from 'styled-components';
 import filter from 'lodash/filter';
 import values from 'lodash/values';
+import get from 'lodash/get';
 import {bindAll} from '~/util';
 
 const Wrapper = styled.div`
@@ -113,6 +114,9 @@ class MainView extends React.Component {
     render() {
         const {isEditorOpen, selectedNote} = this.state;
         const {notes, usersById} = this.props;
+        const author = selectedNote
+            ? usersById[selectedNote.uid || get(this.props.user, 'uid')]
+            : null;
 
         return (
             <Wrapper>
@@ -130,6 +134,7 @@ class MainView extends React.Component {
                             onSave={this.onSave}
                             onDelete={this.onDelete}
                             note={selectedNote}
+                            createdBy={author}
                         />
                     </Floater>
                 )}

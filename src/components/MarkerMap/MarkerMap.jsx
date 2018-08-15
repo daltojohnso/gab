@@ -7,8 +7,7 @@ import styled from 'styled-components';
 import values from 'lodash/values';
 
 import L from 'leaflet';
-// const icon = L.divIcon({className: 'marker-map--div-icon'});
-const icon = L.divIcon();
+
 const MapWrapper = styled.div`
     height: 100%;
     width: 100%;
@@ -87,7 +86,9 @@ class MarkerMap extends React.Component {
                 icon={icon}
                 key={id || fakeId}
                 position={position}
-                onClick={() => this.onMarkerClick(id, position)}
+                onClick={() =>
+                    fakeId ? null : this.onMarkerClick(id, position)
+                }
             />
         );
     }

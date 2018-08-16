@@ -101,12 +101,20 @@ class MarkerMap extends React.Component {
         const {position, zoom} = this.state;
         const {selectedNote, notes, usersById} = this.props;
 
-        const pendingMarker =
-            selectedNote && !selectedNote.id
-                ? this.createMarker(selectedNote, usersById, 'pending-marker')
-                : null;
+        const filteredNotes = selectedNote
+            ? notes.filter(note => note.id !== selectedNote.id)
+            : notes;
+        const pendingMarker = selectedNote
+            ? this.createMarker(
+                selectedNote,
+                usersById,
+                selectedNote.id || 'pending-marker'
+            )
+            : null;
 
-        const markers = notes.map(note => this.createMarker(note, usersById));
+        const markers = filteredNotes.map(note =>
+            this.createMarker(note, usersById)
+        );
         return (
             // no -- you can't use styled(Map).
             <MapWrapper users={values(usersById)}>

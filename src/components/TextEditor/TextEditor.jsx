@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import EditIcon from 'react-feather/dist/icons/edit';
 import XIcon from 'react-feather/dist/icons/x';
 import TrashIcon from 'react-feather/dist/icons/trash-2';
+import MapPinIcon from 'react-feather/dist/icons/map-pin';
 import {
     Editor,
     EditorState,
@@ -37,6 +38,7 @@ const hoverEditButton = <FooterItem>Edit?</FooterItem>;
 const hoverCloseButton = <FooterItem>Close note?</FooterItem>;
 const hoverCancelButton = <FooterItem>Discard changes?</FooterItem>;
 const hoverDeleteButton = <FooterItem>Delete note?</FooterItem>;
+const hoverMoveButton = <FooterItem>Move note?</FooterItem>;
 
 class TextEditor extends React.Component {
     constructor(props) {
@@ -56,6 +58,12 @@ class TextEditor extends React.Component {
             </FooterItem>
         );
 
+        const saveMove = (
+            <FooterItem link onClick={() => this.accept('moving')}>
+                Save New Location
+            </FooterItem>
+        );
+
         const confirmCancel = (
             <FooterItem link onClick={() => this.accept('cancel')}>
                 Are you sure you want to discard changes?
@@ -72,21 +80,27 @@ class TextEditor extends React.Component {
             readOnly: null,
             editing: saveButton,
             cancel: confirmCancel,
-            delete: confirmDelete
+            delete: confirmDelete,
+            moving: saveMove
         };
 
         this.hoverStates = {
             editing: hoverEditButton,
             cancel: hoverCancelButton,
             close: hoverCloseButton,
-            delete: hoverDeleteButton
+            delete: hoverDeleteButton,
+            moving: hoverMoveButton
         };
 
         bindAll(this, ['onChange', 'onFocus', 'handleKeyCommand']);
     }
 
+    isNewNote(prevNote, newNote) {
+        return get(prevNote, 'id') !== get(newNote, 'id');
+    }
+
     componentDidUpdate(prevProps) {
-        if (prevProps.note !== this.props.note) {
+        if (this.isNewNote(prevProps.note, this.props.note)) {
             const {note} = this.props;
             const editorState = getEditorState(note);
 
@@ -168,6 +182,10 @@ class TextEditor extends React.Component {
             case 'editing':
                 this.onSaveEditorContents();
                 break;
+            case 'moving':
+                this.start('readOnly');
+                this.props.onSave();
+                break;
             case 'cancel':
             case 'close':
                 this.props.onCancel();
@@ -236,6 +254,13 @@ class TextEditor extends React.Component {
                         onMouseOut={() => this.clearHover('editing')}
                     >
                         <EditIcon />
+                    </Icon>
+                    <Icon
+                        onClick={() => this.start('moving')}
+                        onMouseOver={() => this.hover('moving')}
+                        onMouseOut={() => this.clearHover('moving')}
+                    >
+                        <MapPinIcon />
                     </Icon>
                     {get(note, 'id') && (
                         <Icon

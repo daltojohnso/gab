@@ -64,8 +64,8 @@ class MainView extends React.Component {
     }
 
     onMapClick(location) {
-        const {selectedNote, isMovingNote, editorMode} = this.state;
-        if (selectedNote && isMovingNote) {
+        const {selectedNote, editorMode} = this.state;
+        if (selectedNote && editorMode === 'moving') {
             this.setState({
                 selectedNote: {
                     ...selectedNote,
@@ -85,12 +85,12 @@ class MainView extends React.Component {
 
     onMarkerSelect(id) {
         const {editorMode} = this.state;
-        if (editorMode === 'editing') return;
+        if (editorMode === 'editing' || editorMode === 'moving') return;
 
         const note = this.props.notes.find(note => note.id === id);
         this.setState({
             isEditorOpen: true,
-            selectedNote: note
+            selectedNote: {...note}
         });
     }
 
@@ -104,17 +104,17 @@ class MainView extends React.Component {
         this.resetEditor();
     }
 
-    onSave({message, rawMessage}) {
+    onSave(messageProps = {}) {
         const {selectedNote} = this.state;
-
         this.props.saveNote(this.props.selectedMapId, {
             ...selectedNote,
-            message,
-            rawMessage,
+            ...messageProps,
             location: selectedNote.location
         });
 
-        this.resetEditor();
+        if (messageProps.message) {
+            this.resetEditor();
+        }
     }
 
     onDelete(noteId) {

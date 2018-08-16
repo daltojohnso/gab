@@ -45,7 +45,7 @@ class MarkerMap extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            position: [0, 0],
+            position: [30, -50],
             zoom: 3
         };
 

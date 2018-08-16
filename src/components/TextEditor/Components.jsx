@@ -25,7 +25,7 @@ export const Icon = ({label, children, ...props}) => (
 
 Icon.propTypes = {
     label: PropTypes.string,
-    children: PropTypes.object
+    children: PropTypes.any
 };
 
 export const OnIcon = ({on, ...props}) => (
@@ -55,5 +55,5 @@ export const FooterItem = ({link, children, ...props}) => {
 
 FooterItem.propTypes = {
     link: PropTypes.bool,
-    children: PropTypes.string
+    children: PropTypes.any
 };

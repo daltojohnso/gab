@@ -25,3 +25,11 @@ export function bindAll (_this, fns = []) {
 export function nowTimestamp () {
     return new Timestamp((Date.now() / 1000) | 0);
 }
+
+export function getDataWithId (docs) {
+    return docs.map(doc => {
+        const data = doc.data();
+        data.id = doc.id;
+        return data;
+    });
+}

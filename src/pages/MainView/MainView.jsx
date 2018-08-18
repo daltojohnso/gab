@@ -1,6 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {fetchMaps} from '~/store/actions/maps';
+import {fetchFirstMapAndNotes} from '~/store/actions/maps';
 import {saveNote, deleteNote} from '~/store/actions/notes';
 import PropTypes from 'prop-types';
 import {MarkerMap, TextEditor} from '~/components';
@@ -60,7 +60,7 @@ class MainView extends React.Component {
     }
 
     componentDidMount () {
-        this.props.fetchMapsAndSelectFirst();
+        this.props.fetchFirstMapAndNotes();
     }
 
     onMapClick (location) {
@@ -182,7 +182,7 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = dispatch => ({
-    fetchMapsAndSelectFirst: () => dispatch(fetchMaps()),
+    fetchFirstMapAndNotes: () => dispatch(fetchFirstMapAndNotes()),
     saveNote: (mapId, note) => dispatch(saveNote(mapId, note)),
     deleteNote: id => dispatch(deleteNote(id))
 });

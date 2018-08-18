@@ -1,20 +1,23 @@
 import {db} from '~/firebase';
-import {nowTimestamp} from '~/util';
+import {nowTimestamp, getDataWithId} from '~/util';
 import get from 'lodash/get';
+import nav from './nav';
+
 const pathToUid = ['auth', 'user', 'uid'];
 
 export const fetchNotes = mapId => {
     return dispatch => {
+        dispatch(nav.isLoading());
         db.collection('notes')
             .where('mapId', '==', mapId)
             .get()
-            .then(notesSnapshot => {
-                const notes = notesSnapshot.docs.map(doc => {
-                    const data = doc.data();
-                    data.id = doc.id;
-                    return data;
-                });
+            .then(snapshot => {
+                const notes = getDataWithId(snapshot.docs);
                 dispatch(addSubsetOfNotes(notes));
+                dispatch(nav.isResolved());
+            })
+            .catch(err => {
+                dispatch(nav.isRejected(err));
             });
     };
 };

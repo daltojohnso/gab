@@ -14,8 +14,8 @@ import head from 'lodash/head';
 import last from 'lodash/last';
 import get from 'lodash/get';
 import {bindAll} from '~/util';
-import Footer from './Footer.jsx';
-import Header from './Header.jsx';
+import Footer from './Footer';
+import Header from './Header';
 
 function getEditorState (note) {
     let contentState;
@@ -49,8 +49,8 @@ class TextEditor extends React.Component {
             'onFocus',
             'handleKeyCommand',
             'accept',
-            'onNewMode',
-            'canCloseImmediately'
+            'onModeChange',
+            'isNoteUnchanged'
         ]);
     }
 
@@ -98,7 +98,7 @@ class TextEditor extends React.Component {
         return 'not-handled';
     }
 
-    canCloseImmediately () {
+    isNoteUnchanged () {
         const {editorState} = this.state;
         const currentContent = editorState.getCurrentContent();
         const text = currentContent.getPlainText();
@@ -112,7 +112,9 @@ class TextEditor extends React.Component {
                 this.onSaveEditorContents();
                 break;
             case 'moving':
-                this.start('readOnly');
+                this.onModeChange({
+                    base: this.isNoteUnchanged() ? ['readOnly'] : ['editing']
+                });
                 this.props.onSave();
                 break;
             case 'cancel':
@@ -125,7 +127,7 @@ class TextEditor extends React.Component {
         }
     }
 
-    onNewMode (params) {
+    onModeChange (params) {
         this.setState(params);
     }
 
@@ -138,10 +140,10 @@ class TextEditor extends React.Component {
                 <Header
                     note={note}
                     mode={{base, hover}}
-                    onNewMode={this.onNewMode}
-                    onNewBase={this.props.onNewMode}
+                    onModeChange={this.onModeChange}
+                    onNewEditorMode={this.props.onNewMode}
                     onCancel={this.props.onCancel}
-                    canCloseImmediately={this.canCloseImmediately}
+                    canCloseImmediately={this.isNoteUnchanged}
                 />
                 <CardContent className="card-content">
                     <Editor

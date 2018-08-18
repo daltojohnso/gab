@@ -1,6 +1,7 @@
 import keyBy from 'lodash/keyBy';
 const initState = {
-    byId: {}
+    byId: {},
+    status: 'resolved'
 };
 const notes = (state = initState, action) => {
     let noteId;
@@ -42,6 +43,26 @@ const notes = (state = initState, action) => {
             delete state.byId[noteId];
             return {
                 ...state
+            };
+        case 'notes/isLoading':
+            return {
+                ...state,
+                status: 'loading'
+            };
+        case 'notes/isResolved':
+            return {
+                ...state,
+                status: 'resolved'
+            };
+        case 'notes/isRejected':
+            return {
+                ...state,
+                status: 'rejected'
+            };
+        case 'notes/resetState':
+            return {
+                ...state,
+                status: 'resolved'  // or just ''?
             };
         default:
             return state;

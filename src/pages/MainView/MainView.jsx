@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {fetchFirstMapAndNotes} from '~/store/actions/maps';
-import {saveNote, deleteNote} from '~/store/actions/notes';
+import {saveNote, deleteNote, resetState as resetNoteState} from '~/store/actions/notes';
 import PropTypes from 'prop-types';
 import {MarkerMap, TextEditor} from '~/components';
 import styled from 'styled-components';
@@ -72,7 +72,8 @@ class MainView extends React.Component {
                     location
                 }
             });
-        } else if (editorMode !== 'editing' || editorMode !== 'moving') {
+        } else if (editorMode !== 'editing' && editorMode !== 'moving') {
+            this.props.resetNoteState();
             this.setState({
                 isEditorOpen: true,
                 selectedNote: {
@@ -86,7 +87,7 @@ class MainView extends React.Component {
     onMarkerSelect (id) {
         const {editorMode} = this.state;
         if (editorMode === 'editing' || editorMode === 'moving') return;
-
+        this.props.resetNoteState();
         const note = this.props.notes.find(note => note.id === id);
         this.setState({
             isEditorOpen: true,
@@ -106,23 +107,29 @@ class MainView extends React.Component {
 
     onSave (messageProps = {}) {
         const {selectedNote} = this.state;
+        if (!selectedNote.id) return;
+
+        this.onNewEditorMode(null);
         this.props.saveNote(this.props.selectedMapId, {
             ...selectedNote,
             ...messageProps,
             location: selectedNote.location
+        }).then(() => {
+            if (messageProps.message) {
+                this.resetEditor();
+            }
         });
-
-        if (messageProps.message) {
-            this.resetEditor();
-        }
     }
 
     onDelete (noteId) {
-        this.props.deleteNote(noteId);
-        this.resetEditor();
+        this.onNewEditorMode(null);
+        this.props.deleteNote(noteId).then(() => {
+            this.resetEditor();
+        });
     }
 
     resetEditor () {
+        this.props.resetNoteState();
         this.setState({
             isEditorOpen: false,
             selectedNote: null,
@@ -174,6 +181,7 @@ MainView.propTypes = {
 const mapStateToProps = state => {
     const selectedMapId = state.maps.selectedMapId;
     return {
+        noteStatus: state.notes.status,
         selectedMapId,
         notes: filter(values(state.notes.byId), {mapId: selectedMapId}),
         usersById: state.users.byId,
@@ -184,7 +192,8 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => ({
     fetchFirstMapAndNotes: () => dispatch(fetchFirstMapAndNotes()),
     saveNote: (mapId, note) => dispatch(saveNote(mapId, note)),
-    deleteNote: id => dispatch(deleteNote(id))
+    deleteNote: id => dispatch(deleteNote(id)),
+    resetNoteState: () => dispatch(resetNoteState())
 });
 
 export default connect(

@@ -9,7 +9,7 @@ const Nav = styled.nav`
     }
 `;
 
-const NavBar = ({isLoading}) => (
+const NavBar = ({isLoading, isRejected}) => (
     <Nav className="navbar is-dark">
         <div className="navbar-brand">
             <div className="navbar-item">
@@ -22,6 +22,11 @@ const NavBar = ({isLoading}) => (
                     <Spinner></Spinner>
                 </div>
             )}
+            {isRejected && (
+                <div className="navbar-item">
+                    Something went wrong...
+                </div>
+            )}
         </div>
         <div className="navbar-menu">
             <div className="navbar-end">
@@ -32,11 +37,13 @@ const NavBar = ({isLoading}) => (
 );
 
 NavBar.propTypes = {
-    isLoading: PropTypes.bool
+    isLoading: PropTypes.bool,
+    isRejected: PropTypes.bool
 };
 
 NavBar.defaultProps = {
-    isLoading:false
+    isLoading: false,
+    isRejected: false
 };
 
 export default NavBar;

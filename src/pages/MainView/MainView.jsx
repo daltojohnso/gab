@@ -42,7 +42,7 @@ const Floater = ({children}) => (
 );
 
 class MainView extends React.Component {
-    constructor() {
+    constructor () {
         super();
         this.state = {
             isEditorOpen: false,
@@ -59,11 +59,11 @@ class MainView extends React.Component {
         ]);
     }
 
-    componentDidMount() {
+    componentDidMount () {
         this.props.fetchMapsAndSelectFirst();
     }
 
-    onMapClick(location) {
+    onMapClick (location) {
         const {selectedNote, editorMode} = this.state;
         if (selectedNote && editorMode === 'moving') {
             this.setState({
@@ -83,7 +83,7 @@ class MainView extends React.Component {
         }
     }
 
-    onMarkerSelect(id) {
+    onMarkerSelect (id) {
         const {editorMode} = this.state;
         if (editorMode === 'editing' || editorMode === 'moving') return;
 
@@ -94,17 +94,17 @@ class MainView extends React.Component {
         });
     }
 
-    onNewEditorMode(mode) {
+    onNewEditorMode (mode) {
         this.setState({
             editorMode: mode
         });
     }
 
-    onCancel() {
+    onCancel () {
         this.resetEditor();
     }
 
-    onSave(messageProps = {}) {
+    onSave (messageProps = {}) {
         const {selectedNote} = this.state;
         this.props.saveNote(this.props.selectedMapId, {
             ...selectedNote,
@@ -117,12 +117,12 @@ class MainView extends React.Component {
         }
     }
 
-    onDelete(noteId) {
+    onDelete (noteId) {
         this.props.deleteNote(noteId);
         this.resetEditor();
     }
 
-    resetEditor() {
+    resetEditor () {
         this.setState({
             isEditorOpen: false,
             selectedNote: null,
@@ -130,7 +130,7 @@ class MainView extends React.Component {
         });
     }
 
-    render() {
+    render () {
         const {isEditorOpen, selectedNote} = this.state;
         const {notes, usersById} = this.props;
         const author = selectedNote

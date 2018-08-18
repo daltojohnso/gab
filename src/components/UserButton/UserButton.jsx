@@ -20,7 +20,7 @@ const StyledUserIcon = styled(UserIcon)`
 `;
 
 class UserButton extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = {
             isActive: false
@@ -36,13 +36,13 @@ class UserButton extends React.Component {
         ]);
     }
 
-    onToggle() {
+    onToggle () {
         this.setState(prevState => ({
             isActive: !prevState.isActive
         }));
     }
 
-    onBlur() {
+    onBlur () {
         // lets the next focus event fire
         setTimeout(() => {
             this.setState({
@@ -51,7 +51,7 @@ class UserButton extends React.Component {
         });
     }
 
-    onFocus() {
+    onFocus () {
         // puts the focus event after the state setting in `onBlur`
         setTimeout(() => {
             this.setState({
@@ -60,7 +60,7 @@ class UserButton extends React.Component {
         });
     }
 
-    onKeyUpToggle(e) {
+    onKeyUpToggle (e) {
         const key = e.key;
         this.setState(prevState => {
             return key === 'Enter'
@@ -71,13 +71,13 @@ class UserButton extends React.Component {
         });
     }
 
-    onKeyUpSignOut(e) {
+    onKeyUpSignOut (e) {
         if (e.key === 'Enter') {
             this.props.onSignOut();
         }
     }
 
-    render() {
+    render () {
         const {isActive} = this.state;
         const {
             user: {displayName, email}

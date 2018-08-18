@@ -5,7 +5,7 @@ import toPairs from 'lodash/toPairs';
 import get from 'lodash/get';
 
 // this could be better
-export function bindAll(_this, fns = []) {
+export function bindAll (_this, fns = []) {
     fns.forEach(fn => {
         if (isArray(fn)) {
             const fnName = fn.shift();
@@ -22,6 +22,6 @@ export function bindAll(_this, fns = []) {
     });
 }
 
-export function nowTimestamp() {
+export function nowTimestamp () {
     return new Timestamp((Date.now() / 1000) | 0);
 }

@@ -8,7 +8,7 @@ import {loginWithEmailAndPassword} from '~/store/actions/auth';
 import {bindAll} from '~/util';
 
 class LoginForm extends React.Component {
-    constructor() {
+    constructor () {
         super();
         this.state = {
             email: '',
@@ -24,18 +24,18 @@ class LoginForm extends React.Component {
         ]);
     }
 
-    onSubmit(e) {
+    onSubmit (e) {
         e.preventDefault();
         this.props.onFormSubmit(this.state.email, this.state.password);
     }
 
-    onChange(prop, e) {
+    onChange (prop, e) {
         this.setState({
             [prop]: e.target.value
         });
     }
 
-    render() {
+    render () {
         return (
             <form onSubmit={this.onSubmit}>
                 <div className="field">
@@ -80,7 +80,7 @@ LoginForm.propTypes = {
 };
 
 class Login extends React.Component {
-    render() {
+    render () {
         return (
             <main>
                 <Hero title="gabgab" />

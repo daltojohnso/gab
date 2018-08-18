@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import get from 'lodash/get';
 
 class Footer extends React.PureComponent {
-    constructor(props) {
+    constructor (props) {
         super(props);
 
         const hoverEditButton = <FooterItem>Edit?</FooterItem>;
@@ -52,7 +52,7 @@ class Footer extends React.PureComponent {
         };
     }
 
-    render() {
+    render () {
         const {base, override, createdBy} = this.props;
         const mode = override ? `${override}Override` : base;
         const name = get(createdBy, 'displayName') || get(createdBy, 'email');

@@ -46,7 +46,7 @@ Unauthed.propTypes = {
 };
 
 class App extends React.Component {
-    render() {
+    render () {
         return this.props.isReady ? (
             <Router>
                 <Switch>

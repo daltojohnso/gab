@@ -43,7 +43,7 @@ export const loginWithEmailAndPassword = (email, password) => {
     };
 };
 
-export function firebaseSignInWithEmailAndPassword(email, password) {
+export function firebaseSignInWithEmailAndPassword (email, password) {
     return firebase
         .auth()
         .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
@@ -52,6 +52,6 @@ export function firebaseSignInWithEmailAndPassword(email, password) {
         });
 }
 
-export function firebaseSignOut() {
+export function firebaseSignOut () {
     return firebase.auth().signOut();
 }

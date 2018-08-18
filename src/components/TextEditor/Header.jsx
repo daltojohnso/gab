@@ -9,11 +9,11 @@ import get from 'lodash/get';
 import head from 'lodash/head';
 
 class Header extends React.PureComponent {
-    constructor(props) {
+    constructor (props) {
         super(props);
     }
 
-    start(base) {
+    start (base) {
         this.props.onNewBase(base);
         this.props.onNewMode({
             base: [base],
@@ -21,7 +21,7 @@ class Header extends React.PureComponent {
         });
     }
 
-    confirm(mode) {
+    confirm (mode) {
         const initialBase = head(this.props.mode.base);
         this.props.onNewMode({
             base: [initialBase, mode],
@@ -36,14 +36,14 @@ class Header extends React.PureComponent {
         }, 3000);
     }
 
-    hover(mode) {
+    hover (mode) {
         if (this.props.mode.base.find(base => base === mode)) return;
         this.props.onNewMode({
             hover: mode
         });
     }
 
-    clearHover(mode) {
+    clearHover (mode) {
         if (this.props.mode.hover === mode) {
             this.props.onNewMode({
                 hover: null
@@ -51,7 +51,7 @@ class Header extends React.PureComponent {
         }
     }
 
-    render() {
+    render () {
         const {
             note,
             mode,

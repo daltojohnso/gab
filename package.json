@@ -7,7 +7,7 @@
     "build": "webpack --config ./webpack.dev.js",
     "build:watch": "webpack --config ./webpack.dev.js  --watch",
     "build:prod": "webpack --config ./webpack.prod.js",
-    "lint": "eslint src --fix",
+    "lint": "eslint 'src/**' --fix",
     "start:dev": "webpack-dev-server --config ./webpack.dev.js --watch --hot --open",
     "test": "NODE_ENV=test ./node_modules/.bin/jest"
   },

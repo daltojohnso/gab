@@ -20,7 +20,7 @@ const MapWrapper = styled.div`
 
         ${props =>
         props.users
-                .map(user => {
+            .map(user => {
                 return `
                             &--${user.uid} {
                                 &::before {
@@ -29,7 +29,7 @@ const MapWrapper = styled.div`
                                 }
                             }
                         `;
-                })
+            })
             .join('\n')};
     }
 `;
@@ -42,7 +42,7 @@ const MapWrapper = styled.div`
 
 // https://www.npmjs.com/package/is-mobile for disabling movement
 class MarkerMap extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = {
             position: [30, -50],
@@ -54,7 +54,7 @@ class MarkerMap extends React.Component {
     }
 
     // TODO: normalize lat, lng for super-far-away map clicks
-    onClick(e) {
+    onClick (e) {
         const {lat, lng} = e.latlng;
         const position = [lat, lng];
         this.props.onMapClick(new GeoPoint(...position));
@@ -63,12 +63,12 @@ class MarkerMap extends React.Component {
         });
     }
 
-    onMarkerClick(id, position) {
+    onMarkerClick (id, position) {
         this.props.onMarkerSelect(id);
         this.setState({position});
     }
 
-    createMarker(note, usersById, fakeId) {
+    createMarker (note, usersById, fakeId) {
         const {
             id,
             createdBy,
@@ -93,11 +93,11 @@ class MarkerMap extends React.Component {
         );
     }
 
-    onViewportChange({zoom}) {
+    onViewportChange ({zoom}) {
         this.setState({zoom});
     }
 
-    render() {
+    render () {
         const {position, zoom} = this.state;
         const {selectedNote, notes, usersById} = this.props;
 

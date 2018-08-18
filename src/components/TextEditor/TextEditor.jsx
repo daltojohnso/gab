@@ -17,7 +17,7 @@ import {bindAll} from '~/util';
 import Footer from './Footer.jsx';
 import Header from './Header.jsx';
 
-function getEditorState(note) {
+function getEditorState (note) {
     let contentState;
     if (note) {
         try {
@@ -33,7 +33,7 @@ function getEditorState(note) {
 }
 
 class TextEditor extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
 
         const {note} = props;
@@ -54,11 +54,11 @@ class TextEditor extends React.Component {
         ]);
     }
 
-    isNewNote(prevNote, newNote) {
+    isNewNote (prevNote, newNote) {
         return get(prevNote, 'id') !== get(newNote, 'id');
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate (prevProps) {
         if (this.isNewNote(prevProps.note, this.props.note)) {
             const {note} = this.props;
             const editorState = getEditorState(note);
@@ -71,7 +71,7 @@ class TextEditor extends React.Component {
         }
     }
 
-    onSaveEditorContents() {
+    onSaveEditorContents () {
         const {editorState} = this.state;
         const currentContent = editorState.getCurrentContent();
         this.props.onSave({
@@ -80,16 +80,16 @@ class TextEditor extends React.Component {
         });
     }
 
-    onChange(editorState) {
+    onChange (editorState) {
         this.setState({editorState});
     }
 
-    onFocus() {
+    onFocus () {
         // not ideal, but I want to clobber empty new notes.
         this.props.onNewMode('editing');
     }
 
-    handleKeyCommand(command, editorState) {
+    handleKeyCommand (command, editorState) {
         const newState = RichUtils.handleKeyCommand(editorState, command);
         if (newState) {
             this.onChange(newState);
@@ -98,7 +98,7 @@ class TextEditor extends React.Component {
         return 'not-handled';
     }
 
-    tryToClose() {
+    tryToClose () {
         const {editorState} = this.state;
         const currentContent = editorState.getCurrentContent();
         const text = currentContent.getPlainText();
@@ -109,7 +109,7 @@ class TextEditor extends React.Component {
         }
     }
 
-    accept(mode) {
+    accept (mode) {
         clearTimeout(this.timeoutId);
         switch (mode) {
             case 'editing':
@@ -129,11 +129,11 @@ class TextEditor extends React.Component {
         }
     }
 
-    onNewMode(params) {
+    onNewMode (params) {
         this.setState(params);
     }
 
-    render() {
+    render () {
         const {editorState, base, hover} = this.state;
         const {note, createdBy} = this.props;
         const editing = head(base) === 'editing';

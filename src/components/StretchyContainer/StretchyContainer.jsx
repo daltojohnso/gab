@@ -53,12 +53,12 @@ const Header = styled.div`
 `;
 
 export class StretchyContainer extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = {};
     }
 
-    componentDidMount() {
+    componentDidMount () {
         // Minimum resizable area
         var minWidth = 60;
         var minHeight = 40;
@@ -82,14 +82,14 @@ export class StretchyContainer extends React.Component {
         var pane = document.getElementById('stretchy-container');
         var ghostpane = document.getElementById('background-panel');
 
-        function setBounds(element, x, y, w, h) {
+        function setBounds (element, x, y, w, h) {
             element.style.left = x + 'px';
             element.style.top = y + 'px';
             element.style.width = w + 'px';
             element.style.height = h + 'px';
         }
 
-        function hintHide() {
+        function hintHide () {
             setBounds(ghostpane, b.left, b.top, b.width, b.height);
             ghostpane.style.opacity = 0;
 
@@ -110,25 +110,25 @@ export class StretchyContainer extends React.Component {
         document.addEventListener('touchmove', onTouchMove);
         document.addEventListener('touchend', onTouchEnd);
 
-        function onTouchDown(e) {
+        function onTouchDown (e) {
             onDown(e.touches[0]);
             e.preventDefault();
         }
 
-        function onTouchMove(e) {
+        function onTouchMove (e) {
             onMove(e.touches[0]);
         }
 
-        function onTouchEnd(e) {
+        function onTouchEnd (e) {
             if (e.touches.length == 0) onUp(e.changedTouches[0]);
         }
 
-        function onMouseDown(e) {
+        function onMouseDown (e) {
             onDown(e);
             e.preventDefault();
         }
 
-        function onDown(e) {
+        function onDown (e) {
             calc(e);
 
             var isResizing =
@@ -150,11 +150,11 @@ export class StretchyContainer extends React.Component {
             };
         }
 
-        function canMove() {
+        function canMove () {
             return x > 0 && x < b.width && y > 0 && y < b.height && y < 30;
         }
 
-        function calc(e) {
+        function calc (e) {
             b = pane.getBoundingClientRect();
             x = e.clientX - b.left;
             y = e.clientY - b.top;
@@ -170,7 +170,7 @@ export class StretchyContainer extends React.Component {
 
         var e;
 
-        function onMove(ee) {
+        function onMove (ee) {
             calc(ee);
 
             e = ee;
@@ -178,7 +178,7 @@ export class StretchyContainer extends React.Component {
             redraw = true;
         }
 
-        function animate() {
+        function animate () {
             requestAnimationFrame(animate);
 
             if (!redraw) return;
@@ -319,7 +319,7 @@ export class StretchyContainer extends React.Component {
 
         animate();
 
-        function onUp(e) {
+        function onUp (e) {
             calc(e);
 
             if (clicked && clicked.isMoving) {
@@ -395,7 +395,7 @@ export class StretchyContainer extends React.Component {
         }
     }
 
-    render() {
+    render () {
         return (
             <React.Fragment>
                 <Panel id="stretchy-container">

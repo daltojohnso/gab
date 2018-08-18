@@ -72,7 +72,7 @@ class MainView extends React.Component {
                     location
                 }
             });
-        } else if (editorMode !== 'editing') {
+        } else if (editorMode !== 'editing' || editorMode !== 'moving') {
             this.setState({
                 isEditorOpen: true,
                 selectedNote: {

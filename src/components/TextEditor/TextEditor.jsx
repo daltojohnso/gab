@@ -49,8 +49,8 @@ class TextEditor extends React.Component {
             'onFocus',
             'handleKeyCommand',
             'accept',
-            'tryToClose',
-            'onNewMode'
+            'onNewMode',
+            'canCloseImmediately'
         ]);
     }
 
@@ -98,15 +98,11 @@ class TextEditor extends React.Component {
         return 'not-handled';
     }
 
-    tryToClose () {
+    canCloseImmediately () {
         const {editorState} = this.state;
         const currentContent = editorState.getCurrentContent();
         const text = currentContent.getPlainText();
-        if (text === get(this.props, ['note', 'message'], '')) {
-            this.props.onCancel();
-        } else {
-            this.confirm('cancel');
-        }
+        return text === get(this.props, ['note', 'message'], '');
     }
 
     accept (mode) {
@@ -144,7 +140,8 @@ class TextEditor extends React.Component {
                     mode={{base, hover}}
                     onNewMode={this.onNewMode}
                     onNewBase={this.props.onNewMode}
-                    onClose={this.tryToClose}
+                    onCancel={this.props.onCancel}
+                    canCloseImmediately={this.canCloseImmediately}
                 />
                 <CardContent className="card-content">
                     <Editor

@@ -13,6 +13,10 @@ class Header extends React.PureComponent {
         super(props);
     }
 
+    componentWillUnmount () {
+        clearTimeout(this.timeoutId);
+    }
+
     start (base) {
         this.props.onNewBase(base);
         this.props.onNewMode({
@@ -51,11 +55,18 @@ class Header extends React.PureComponent {
         }
     }
 
+    tryToClose (mode) {
+        if (this.props.canCloseImmediately()) {
+            this.props.onCancel();
+        } else {
+            this.confirm(mode);
+        }
+    }
+
     render () {
         const {
             note,
-            mode,
-            onClose
+            mode
         } = this.props;
         const editing = head(mode.base) === 'editing';
 
@@ -91,7 +102,7 @@ class Header extends React.PureComponent {
                 )}
                 {editing && (
                     <Icon
-                        onClick={() => onClose()}
+                        onClick={() => this.tryToClose('cancel')}
                         onMouseOver={() => this.hover('cancel')}
                         onMouseOut={() => this.clearHover('cancel')}
                     >
@@ -100,7 +111,7 @@ class Header extends React.PureComponent {
                 )}
                 {!editing && (
                     <Icon
-                        onClick={() => onClose()}
+                        onClick={() => this.tryToClose('close')}
                         onMouseOver={() => this.hover('close')}
                         onMouseOut={() => this.clearHover('close')}
                     >
@@ -115,7 +126,8 @@ class Header extends React.PureComponent {
 Header.propTypes = {
     note: PropTypes.object,
     mode: PropTypes.object,
-    onClose: PropTypes.func,
+    canCloseImmediately: PropTypes.func,
+    onCancel: PropTypes.func,
     onNewBase: PropTypes.func,
     onNewMode: PropTypes.func
 };

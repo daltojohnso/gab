@@ -97,7 +97,7 @@ class Header extends React.PureComponent {
                         <HeaderSpinner size="15px" border="2px solid #000"></HeaderSpinner>
                     )}
                     {isRejected && (
-                        <HeaderError>That didn't work. Try again?</HeaderError>
+                        <HeaderError>That didn{'\''}t work. Try again?</HeaderError>
                     )}
                 </p>
                 {!editing && (

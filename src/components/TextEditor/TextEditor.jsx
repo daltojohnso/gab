@@ -80,6 +80,15 @@ class TextEditor extends React.Component {
         });
     }
 
+    onSaveLocation () {
+        this.onModeChange({
+            base: this.isNoteUnchanged() ? ['readOnly'] : ['editing']
+        });
+        if (this.props.note.id) {
+            this.props.onSave();
+        }
+    }
+
     onChange (editorState) {
         this.setState({editorState});
     }
@@ -112,10 +121,7 @@ class TextEditor extends React.Component {
                 this.onSaveEditorContents();
                 break;
             case 'moving':
-                this.onModeChange({
-                    base: this.isNoteUnchanged() ? ['readOnly'] : ['editing']
-                });
-                this.props.onSave();
+                this.onSaveLocation();
                 break;
             case 'cancel':
             case 'close':

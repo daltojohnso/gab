@@ -94,16 +94,20 @@ class MainView extends React.Component {
         const author = selectedNote
             ? usersById[selectedNote.uid || get(this.props.user, 'uid')]
             : null;
-
+        const mapClass = selectedNote ? 'editor-open' : '';
         return (
             <Wrapper>
-                <MarkerMap
-                    onMapClick={this.onMapClick}
-                    onMarkerClick={this.onMarkerClick}
-                    selectedNote={selectedNote}
-                    notes={notes}
-                    usersById={usersById}
-                />
+                <MapWrap
+                    className={mapClass}
+                >
+                    <MarkerMap
+                        onMapClick={this.onMapClick}
+                        onMarkerClick={this.onMarkerClick}
+                        selectedNote={selectedNote}
+                        notes={notes}
+                        usersById={usersById}
+                    />
+                </MapWrap>
                 {selectedNote && (
                     <Floater>
                         <TextEditor
@@ -137,6 +141,17 @@ const Wrapper = styled.div`
     width: 100%;
 `;
 
+const MapWrap = styled.div`
+    height: 100%;
+    width: 100%;
+
+    @media all and (max-width: 768px) {
+        &.editor-open {
+            height: 35vh;
+        }
+    }
+`;
+
 const FloatyWrapper = styled.div`
     position: absolute;
     z-index: 499;
@@ -145,16 +160,31 @@ const FloatyWrapper = styled.div`
     background-color: white;
     opacity: 0.9;
 
-    min-height: 30rem;
-    max-height: 30rem;
-    min-width: 30rem;
-    max-width: 30rem;
+    min-height: 25rem;
+    max-height: 25rem;
+    width: 22rem;
+    max-width: 45vw;
+
+    @media all and (max-width: 768px) {
+        position: relative;
+        top: 0;
+        right: 0;
+        min-width: 100vw;
+        max-width: 100vw;
+        height: calc(65vh - 52px);
+        min-height: unset;
+        max-height: unset;
+    }
 `;
 
 const FloatyInner = styled.div`
     position: relative;
-    height: 30rem;
+    height: 25rem;
     overflow-y: auto;
+
+    @media all and (max-width: 768px) {
+        height: inherit;
+    }
 `;
 
 const Floater = ({children}) => (

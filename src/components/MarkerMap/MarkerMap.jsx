@@ -24,14 +24,18 @@ class MarkerMap extends React.Component {
         const {lat, lng} = e.latlng;
         const position = [lat, lng];
         this.props.onMapClick(new GeoPoint(...position));
-        this.setState({
-            position
+        setTimeout(() => {
+            this.mapRef.current.leafletElement.invalidateSize();
+            this.setState({position});
         });
     }
 
     onMarkerClick (id, position) {
         this.props.onMarkerClick(id);
-        this.setState({position});
+        setTimeout(() => {
+            this.mapRef.current.leafletElement.invalidateSize();
+            this.setState({position});
+        });
     }
 
     createMarker (note, usersById, fakeId) {

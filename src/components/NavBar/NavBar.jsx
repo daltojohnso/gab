@@ -27,10 +27,16 @@ const NavBar = ({isLoading, isRejected}) => (
                     Something went wrong...
                 </div>
             )}
+            <a style={{visibility: 'hidden'}} className="navbar-burger has-text-white">
+                <span aria-hidden="true" />
+                <span aria-hidden="true" />
+                <span aria-hidden="true" />
+            </a>
+            <UserButton className="navbar-item is-hidden-desktop" />
         </div>
         <div className="navbar-menu">
             <div className="navbar-end">
-                <UserButton className="navbar-item" />
+                <UserButton className="navbar-item is-hidden-touch" />
             </div>
         </div>
     </Nav>

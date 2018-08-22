@@ -40,8 +40,7 @@ class TextEditor extends React.Component {
         const editorState = getEditorState(note);
         this.state = {
             editorState,
-            base: note && note.id ? ['readOnly'] : ['editing'],
-            hover: null
+            base: note && note.id ? ['readOnly'] : ['editing']
         };
 
         bindAll(this, [
@@ -65,8 +64,7 @@ class TextEditor extends React.Component {
 
             this.setState({
                 editorState,
-                base: note && note.id ? ['readOnly'] : ['editing'],
-                hover: null
+                base: note && note.id ? ['readOnly'] : ['editing']
             });
         }
     }
@@ -138,14 +136,14 @@ class TextEditor extends React.Component {
     }
 
     render () {
-        const {editorState, base, hover} = this.state;
+        const {editorState, base} = this.state;
         const {note, createdBy} = this.props;
         const editing = head(base) === 'editing';
         return (
             <Card className="card">
                 <Header
                     note={note}
-                    mode={{base, hover}}
+                    mode={{base}}
                     onModeChange={this.onModeChange}
                     onNewEditorMode={this.props.onNewMode}
                     onCancel={this.props.onCancel}
@@ -162,7 +160,6 @@ class TextEditor extends React.Component {
                 </CardContent>
                 <Footer
                     base={last(base)}
-                    override={hover}
                     createdBy={createdBy}
                     onClick={this.accept}
                 />

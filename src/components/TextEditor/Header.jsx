@@ -34,16 +34,14 @@ class Header extends React.PureComponent {
     start (base) {
         this.props.onNewEditorMode(base);
         this.props.onModeChange({
-            base: [base],
-            hover: null
+            base: [base]
         });
     }
 
     confirm (mode) {
         const initialBase = head(this.props.mode.base);
         this.props.onModeChange({
-            base: [initialBase, mode],
-            hover: null
+            base: [initialBase, mode]
         });
 
         clearTimeout(this.timeoutId);
@@ -52,21 +50,6 @@ class Header extends React.PureComponent {
                 base: [initialBase]
             });
         }, 3000);
-    }
-
-    hover (mode) {
-        if (this.props.mode.base.find(base => base === mode)) return;
-        this.props.onModeChange({
-            hover: mode
-        });
-    }
-
-    clearHover (mode) {
-        if (this.props.mode.hover === mode) {
-            this.props.onModeChange({
-                hover: null
-            });
-        }
     }
 
     tryToClose () {
@@ -103,24 +86,21 @@ class Header extends React.PureComponent {
                 {!editing && (
                     <Icon
                         onClick={() => this.start('editing')}
-                        onMouseOver={() => this.hover('editing')}
-                        onMouseOut={() => this.clearHover('editing')}
+                        title='Edit note?'
                     >
                         <EditIcon />
                     </Icon>
                 )}
                 <Icon
                     onClick={() => this.start('moving')}
-                    onMouseOver={() => this.hover('moving')}
-                    onMouseOut={() => this.clearHover('moving')}
+                    title='Move note?'
                 >
                     <MapPinIcon />
                 </Icon>
                 {get(note, 'id') && (
                     <Icon
                         onClick={() => this.confirm('delete')}
-                        onMouseOver={() => this.hover('delete')}
-                        onMouseOut={() => this.clearHover('delete')}
+                        title='Delete note?'
                     >
                         <TrashIcon />
                     </Icon>
@@ -128,8 +108,7 @@ class Header extends React.PureComponent {
                 {editing && (
                     <Icon
                         onClick={() => this.tryToClose()}
-                        onMouseOver={() => this.hover('cancel')}
-                        onMouseOut={() => this.clearHover('cancel')}
+                        title='Discard changes?'
                     >
                         <XIcon />
                     </Icon>
@@ -137,8 +116,7 @@ class Header extends React.PureComponent {
                 {!editing && (
                     <Icon
                         onClick={() => this.tryToClose()}
-                        onMouseOver={() => this.hover('close')}
-                        onMouseOut={() => this.clearHover('close')}
+                        title='Close note?'
                     >
                         <XIcon />
                     </Icon>

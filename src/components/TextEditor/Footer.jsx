@@ -7,12 +7,6 @@ class Footer extends React.PureComponent {
     constructor (props) {
         super(props);
 
-        const hoverEditButton = <FooterItem>Edit?</FooterItem>;
-        const hoverCloseButton = <FooterItem>Close note?</FooterItem>;
-        const hoverCancelButton = <FooterItem>Discard changes?</FooterItem>;
-        const hoverDeleteButton = <FooterItem>Delete note?</FooterItem>;
-        const hoverMoveButton = <FooterItem>Move note?</FooterItem>;
-
         const rejectedFooter = (
             <FooterItem link onClick={() => this.props.onClick('editing')}>
                Saving failed. Try again?
@@ -49,12 +43,6 @@ class Footer extends React.PureComponent {
             cancel: confirmCancel,
             delete: confirmDelete,
             moving: saveMove,
-
-            editingOverride: hoverEditButton,
-            cancelOverride: hoverCancelButton,
-            closeOverride: hoverCloseButton,
-            deleteOverride: hoverDeleteButton,
-            movingOverride: hoverMoveButton,
 
             loading: <LoaderFooter />,
             rejected: rejectedFooter

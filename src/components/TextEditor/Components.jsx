@@ -11,6 +11,7 @@ export const Card = styled.div`
 
 export const CardContent = styled.div`
     flex: 1;
+    overflow: auto;
 
     > .DraftEditor-root {
         height: 100%;

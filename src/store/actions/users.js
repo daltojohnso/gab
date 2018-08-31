@@ -21,6 +21,16 @@ export const fetchUsers = userIds => {
     };
 };
 
+export const fetchUsersOfMap = mapId => {
+    return (dispatch, getState) => {
+        const state = getState();
+        const map = state.maps.byId[mapId];
+        if (!map) return;
+        const sharedWith = Object.keys(map.sharedWith);
+        return dispatch(fetchUsers(sharedWith));
+    };
+};
+
 export const addSubsetOfUsers = users => ({
     type: 'users/addSubset',
     users

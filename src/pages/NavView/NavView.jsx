@@ -14,6 +14,7 @@ const NavView = () => (
         <NavBar />
         <Main>
             <Route exact path="/" component={MainView} />
+            <Route exact path="/map/:mapId" component={MainView} />
         </Main>
     </React.Fragment>
 );

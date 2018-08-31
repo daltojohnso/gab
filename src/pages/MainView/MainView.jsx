@@ -24,7 +24,9 @@ class MainView extends React.Component {
     }
 
     componentDidMount () {
-        this.props.fetchFirstMapAndNotes();
+        this.props.fetch(
+            get(this.props, 'match.params.mapId')
+        );
     }
 
     onMapClick (location) {
@@ -126,7 +128,7 @@ class MainView extends React.Component {
 }
 
 MainView.propTypes = {
-    fetchFirstMapAndNotes: PropTypes.func,
+    fetch: PropTypes.func,
     resetNoteState: PropTypes.func,
     selectedMapId: PropTypes.string,
     notes: PropTypes.array,

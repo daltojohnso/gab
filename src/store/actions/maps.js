@@ -33,6 +33,22 @@ export const fetchFirstMapAndNotes = () => {
     };
 };
 
+export const fetchMap = mapId => {
+    return dispatch => {
+        return db
+            .collection('maps')
+            .doc(mapId)
+            .get()
+            .then(doc => {
+                const map = doc.data();
+                map.id = doc.id;
+                dispatch(setMaps([map]));
+                const sharedWith = get(map, ['0', 'sharedWith'], {});
+                dispatch(fetchUsers(Object.keys(sharedWith)));
+            });
+    };
+};
+
 export const fetchMaps = () => {
     return (dispatch, getState) => {
         const uid = get(getState(), ['auth', 'user', 'uid']);
@@ -58,7 +74,7 @@ export const fetchMaps = () => {
 };
 
 export const setMaps = maps => ({
-    type: 'maps/setMaps',
+    type: 'maps/setSubset',
     maps
 });
 

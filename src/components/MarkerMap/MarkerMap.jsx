@@ -56,6 +56,7 @@ class MarkerMap extends React.Component {
                 icon={icon}
                 key={id || fakeId}
                 position={position}
+                tabindex="0"
                 onClick={() =>
                     fakeId ? null : this.onMarkerClick(id, position)
                 }
@@ -132,6 +133,9 @@ const MapWrapper = styled.div`
     width: 100%;
 
     .marker-map--div-icon {
+        height: 2rem !important;
+        width: 2rem !important;
+
         &::before {
             font-size: 1.5rem;
             content: '🌚';
@@ -142,6 +146,9 @@ const MapWrapper = styled.div`
             .map(user => {
                 return `
                             &--${user.uid} {
+                                height: 1.5rem !important;
+                                width: 1.5rem !important;
+
                                 &::before {
                                     font-size: 1.5rem;
                                     content: '${user.icon}';

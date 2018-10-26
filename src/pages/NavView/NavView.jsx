@@ -1,6 +1,6 @@
 import React from 'react';
 import {NavBar} from '~/components';
-import {MainView} from '~/pages';
+import {MainView, MapListView} from '~/pages';
 import {Route} from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -14,6 +14,7 @@ const NavView = () => (
         <NavBar />
         <Main>
             <Route exact path="/" component={MainView} />
+            <Route exact path="/maps" component={MapListView} />
             <Route exact path="/map/:mapId" component={MainView} />
         </Main>
     </React.Fragment>

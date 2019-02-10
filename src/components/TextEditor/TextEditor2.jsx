@@ -207,19 +207,19 @@ class TextEditor extends React.Component {
 
     onSave () {
         const {editorState} = this.state;
-            const currentContent = editorState.getCurrentContent();
-            this.props.onChange(EDITOR_STATES.save, {
-                message: currentContent.getPlainText(),
-                rawMessage: convertToRaw(currentContent)
-            });
-        }
+        const currentContent = editorState.getCurrentContent();
+        this.props.onChange(EDITOR_STATES.save, {
+            message: currentContent.getPlainText(),
+            rawMessage: convertToRaw(currentContent)
+        });
+    }
 
-        onSaveLocation () {
-            this.updateFooterWithOverride();
-            if (this.props.note.id !== undefined) {
-                this.props.onChange(EDITOR_STATES.save);
-            }
+    onSaveLocation () {
+        this.updateFooterWithOverride();
+        if (this.props.note.id !== undefined) {
+            this.props.onChange(EDITOR_STATES.save);
         }
+    }
 
     render () {
         const {editorState, footer, isReadOnly, isNew, isEditing} = this.state;
@@ -260,13 +260,15 @@ class TextEditor extends React.Component {
                                 <MoveIcon className="" />
                             </div>
                         )}
-                        <div className="p-1 mr-0 text-grey hover:text-grey-darker cursor-pointer active:text-black"
-                            tabIndex="0"
-                            onMouseOver={() => this.updateFooter(EDITOR_STATES.focus)}
-                            onMouseOut={() => this.updateFooter()}
-                            onClick={() => this.onClick(EDITOR_STATES.focus)}>
-                            <FocusIcon className="" />
-                        </div>
+                        {false && (
+                            <div className="p-1 mr-0 text-grey hover:text-grey-darker cursor-pointer active:text-black"
+                                tabIndex="0"
+                                onMouseOver={() => this.updateFooter(EDITOR_STATES.focus)}
+                                onMouseOut={() => this.updateFooter()}
+                                onClick={() => this.onClick(EDITOR_STATES.focus)}>
+                                <FocusIcon className="" />
+                            </div>
+                        )}
                         <div className="p-1 text-grey hover:text-grey-darker cursor-pointer active:text-black"
                             tabIndex="0"
                             onMouseOver={() => this.updateFooter(isEditing ? EDITOR_STATES.closeEdited : EDITOR_STATES.close)}

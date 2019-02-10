@@ -46,7 +46,7 @@ class LoginForm extends React.Component {
         const error = this.state.error;
         return (
             <div className="w-full max-w-xs">
-                <form className="bg-white sm:shadow-md rounded px-8 pt-6 pb-8 mb-4" onSubmit={this.onSubmit}>
+                <form className="bg-white sm:shadow-md rounded px-8 pt-6 pb-8 mb-4" onSubmit={this.onSubmit} action="login" method="post">
                     <div className="mb-4">
                         <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="email">
                                 Email

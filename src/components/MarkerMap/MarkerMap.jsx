@@ -19,10 +19,6 @@ class MarkerMap extends React.Component {
         bindAll(this, ['onViewportChange', 'onClick']);
     }
 
-    componentWillUnmount () {
-        this.map.remove();
-    }
-
     // TODO: normalize lat, lng for super-far-away map clicks
     onClick (e) {
         const {lat, lng} = e.latlng;

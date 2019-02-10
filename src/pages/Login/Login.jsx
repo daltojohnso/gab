@@ -1,7 +1,4 @@
 import React from 'react';
-import {Hero} from '~/components';
-import MailIcon from 'react-feather/dist/icons/mail';
-import LockIcon from 'react-feather/dist/icons/lock';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {loginWithEmailAndPassword} from '~/store/actions/auth';
@@ -24,9 +21,19 @@ class LoginForm extends React.Component {
         ]);
     }
 
-    onSubmit (e) {
+    async onSubmit (e) {
         e.preventDefault();
-        this.props.onFormSubmit(this.state.email, this.state.password);
+        this.setState({
+            error: ''
+        });
+
+        try {
+            await this.props.onFormSubmit(this.state.email, this.state.password);
+        } catch (e) {
+            this.setState({
+                error: e.message
+            });
+        }
     }
 
     onChange (prop, e) {
@@ -36,42 +43,42 @@ class LoginForm extends React.Component {
     }
 
     render () {
+        const error = this.state.error;
         return (
-            <form onSubmit={this.onSubmit}>
-                <div className="field">
-                    <p className="control has-icons-left has-icons-right">
+            <div className="w-full max-w-xs">
+                <form className="bg-white sm:shadow-md rounded px-8 pt-6 pb-8 mb-4" onSubmit={this.onSubmit}>
+                    <div className="mb-4">
+                        <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="email">
+                                Email
+                        </label>
                         <input
-                            className="input"
-                            type="email"
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker leading-tight focus:outline-none focus:shadow-outline"
+                            id="email"
+                            type="text"
                             placeholder="Email"
                             value={this.state.email}
-                            onChange={this.onEmailChange}
-                        />
-                        <span className="icon is-small is-left">
-                            <MailIcon />
-                        </span>
-                    </p>
-                </div>
-                <div className="field">
-                    <p className="control has-icons-left">
+                            onChange={this.onEmailChange} />
+                    </div>
+                    <div className="mb-6">
+                        <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="password">
+                                Password
+                        </label>
                         <input
-                            className="input"
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker mb-3 leading-tight focus:outline-none focus:shadow-outline"
+                            id="password"
                             type="password"
-                            placeholder="Password"
+                            placeholder="******************"
                             value={this.state.password}
-                            onChange={this.onPasswordChange}
-                        />
-                        <span className="icon is-small is-left">
-                            <LockIcon />
-                        </span>
-                    </p>
-                </div>
-                <div className="field">
-                    <p className="control">
-                        <button className="button is-success">Login</button>
-                    </p>
-                </div>
-            </form>
+                            onChange={this.onPasswordChange} />
+                        <p className="text-red text-xs italic">{error}</p>
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <button className="bg-blue hover:bg-blue-dark text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                                Sign In
+                        </button>
+                    </div>
+                </form>
+            </div>
         );
     }
 }
@@ -82,19 +89,12 @@ LoginForm.propTypes = {
 class Login extends React.Component {
     render () {
         return (
-            <main>
-                <Hero title="gabgab" />
-                <section className="section">
-                    <div className="columns is-centered">
-                        <div className="column is-5">
-                            <LoginForm
-                                onFormSubmit={this.props.loginWithEmailAndPassword.bind(
-                                    this
-                                )}
-                            />
-                        </div>
-                    </div>
-                </section>
+            <main className="w-screen flex justify-center py-16">
+                <LoginForm
+                    onFormSubmit={this.props.loginWithEmailAndPassword.bind(
+                        this
+                    )}
+                />
             </main>
         );
     }

@@ -25,14 +25,14 @@ module.exports = {
                 use: {
                     loader: 'babel-loader',
                     options: {
-                        presets: [['env'], ['react']],
-                        plugins: ['transform-object-rest-spread']
+                        presets: [['@babel/preset-env'], ['@babel/preset-react']],
+                        plugins: ['@babel/plugin-proposal-object-rest-spread', '@babel/plugin-transform-async-to-generator']
                     }
                 }
             },
             {
                 test: /\.css$/,
-                use: ['style-loader', 'css-loader']
+                use: ['style-loader', 'css-loader', 'postcss-loader']
             },
             {
                 test: /\.(jpg|png|gif|svg)$/,

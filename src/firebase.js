@@ -7,9 +7,6 @@ import store from '~/store';
 
 firebase.initializeApp(config);
 export const db = firebase.firestore();
-db.settings({
-    timestampsInSnapshots: true
-});
 
 firebase.auth().onAuthStateChanged(user => {
     let currentUser = null;

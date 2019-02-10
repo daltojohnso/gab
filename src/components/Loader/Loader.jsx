@@ -1,108 +1,28 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import LoaderIcon from 'react-feather/dist/icons/loader';
+import classnames from 'classnames';
 
-const speed = '2.0s';
-const spacing = 50;
-const LoaderDiv = styled.div`
-    .cs-loader {
-        height: 100%;
-        width: 100%;
-    }
+const Rotate = styled.div`
+    animation: spin 2s linear infinite;
 
-    .cs-loader-inner {
-        color: #000;
-    }
-
-    .cs-loader-inner label {
-        font-size: 0.5rem;
-        opacity: 0;
-        display: inline-block;
-    }
-
-    @keyframes move {
-        0% {
-            opacity: 0;
-            transform: translateX(-300px);
-        }
-        33% {
-            opacity: 1;
-            transform: translateX(0px);
-        }
-        66% {
-            opacity: 1;
-            transform: translateX(0px);
-        }
+    @keyframes spin {
         100% {
-            opacity: 0;
-            transform: translateX(300px);
+            transform: rotate(360deg);
         }
-    }
-
-    @-webkit-keyframes move {
-        0% {
-            opacity: 0;
-            -webkit-transform: translateX(-300px);
-        }
-        33% {
-            opacity: 1;
-            -webkit-transform: translateX(0px);
-        }
-        66% {
-            opacity: 1;
-            -webkit-transform: translateX(0px);
-        }
-        100% {
-            opacity: 0;
-            -webkit-transform: translateX(300px);
-        }
-    }
-
-    .cs-loader-inner label:nth-child(6) {
-        -webkit-animation: move ${speed} infinite ease-in-out;
-        animation: move ${speed} infinite ease-in-out;
-    }
-
-    .cs-loader-inner label:nth-child(5) {
-        -webkit-animation: move ${speed} ${spacing}ms infinite ease-in-out;
-        animation: move ${speed} ${spacing}ms infinite ease-in-out;
-    }
-
-    .cs-loader-inner label:nth-child(4) {
-        -webkit-animation: move ${speed} ${spacing * 2}ms infinite ease-in-out;
-        animation: move ${speed} ${spacing * 2}ms infinite ease-in-out;
-    }
-
-    .cs-loader-inner label:nth-child(3) {
-        -webkit-animation: move ${speed} ${spacing * 3}ms infinite ease-in-out;
-        animation: move ${speed} ${spacing * 3}ms infinite ease-in-out;
-    }
-
-    .cs-loader-inner label:nth-child(2) {
-        -webkit-animation: move ${speed} ${spacing * 4}ms infinite ease-in-out;
-        animation: move ${speed} ${spacing * 4}ms infinite ease-in-out;
-    }
-
-    .cs-loader-inner label:nth-child(1) {
-        -webkit-animation: move ${speed} ${spacing * 5}ms infinite ease-in-out;
-        animation: move ${speed} ${spacing * 5}ms infinite ease-in-out;
     }
 `;
 
-class Loader extends React.PureComponent {
-    render () {
-        return (
-            <LoaderDiv className="cs-loader">
-                <div className="cs-loader-inner">
-                    <label> ●</label>
-                    <label> ●</label>
-                    <label> ●</label>
-                    <label> ●</label>
-                    <label> ●</label>
-                    <label> ●</label>
-                </div>
-            </LoaderDiv>
-        );
-    }
-}
+const Loader = ({className}) => (
+    <Rotate className="leading-zero inline-block">
+        <LoaderIcon className={classnames('w-7 h-7 text-black', className)} />
+    </Rotate>
+);
+
+Loader.propTypes = {
+    className: PropTypes.string
+};
+
 
 export default Loader;

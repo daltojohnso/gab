@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import {Map, TileLayer, Marker} from 'react-leaflet';
 import {bindAll} from '~/util';
 import {GeoPoint} from '~/firebase';
-import styled from 'styled-components';
-import values from 'lodash/values';
+import noop from 'lodash/noop';
 import L from 'leaflet';
+import MapPinBlue from '~/img/map-pin-blue.svg';
 
 class MarkerMap extends React.Component {
     constructor (props) {
@@ -17,6 +17,10 @@ class MarkerMap extends React.Component {
 
         this.mapRef = React.createRef();
         bindAll(this, ['onViewportChange', 'onClick']);
+    }
+
+    componentWillUnmount () {
+        this.map.remove();
     }
 
     // TODO: normalize lat, lng for super-far-away map clicks
@@ -41,16 +45,17 @@ class MarkerMap extends React.Component {
     createMarker (note, usersById, fakeId) {
         const {
             id,
-            createdBy,
+            // createdBy,
             location: {latitude, longitude}
         } = note;
         const position = [latitude, longitude];
-        const user = usersById[createdBy];
-        const className = user
-            ? `marker-map--div-icon--${user.uid}`
-            : 'marker-map--div-icon';
+        // const user = usersById[createdBy];
 
-        const icon = L.divIcon({className});
+        const icon = new L.Icon({
+            iconUrl: MapPinBlue,
+            className: 'gab--leaflet-icon text-black h-7 w-7'
+        });
+
         return (
             <Marker
                 icon={icon}
@@ -86,27 +91,25 @@ class MarkerMap extends React.Component {
         const markers = filteredNotes.map(note =>
             this.createMarker(note, usersById)
         );
+
         return (
-            // no -- you can't use styled(Map).
-            <MapWrapper users={values(usersById)}>
-                <Map
-                    animate={true}
-                    style={{height: '100%', width: '100%'}}
-                    center={position}
-                    zoom={zoom}
-                    worldCopyJump={true}
-                    ref={this.mapRef}
-                    onViewportChange={this.onViewportChange}
-                    onClick={this.onClick}
-                >
-                    <TileLayer
-                        attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    {pendingMarker}
-                    {markers}
-                </Map>
-            </MapWrapper>
+            <Map
+                animate={true}
+                style={{height: '100%', width: '100%'}}
+                center={position}
+                zoom={zoom}
+                worldCopyJump={true}
+                ref={this.mapRef}
+                onViewportChange={this.onViewportChange}
+                onClick={this.onClick}
+            >
+                <TileLayer
+                    attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                {pendingMarker}
+                {markers}
+            </Map>
         );
     }
 }
@@ -120,45 +123,12 @@ MarkerMap.propTypes = {
     position: PropTypes.array
 };
 
-const noop = () => {};
 MarkerMap.defaultProps = {
     notes: [],
     usersById: {},
     onMapClick: noop,
     onMarkerClick: noop
 };
-
-const MapWrapper = styled.div`
-    height: 100%;
-    width: 100%;
-
-    .marker-map--div-icon {
-        height: 2rem !important;
-        width: 2rem !important;
-
-        &::before {
-            font-size: 1.5rem;
-            content: '🌚';
-        }
-
-        ${props =>
-        props.users
-            .map(user => {
-                return `
-                            &--${user.uid} {
-                                height: 1.5rem !important;
-                                width: 1.5rem !important;
-
-                                &::before {
-                                    font-size: 1.5rem;
-                                    content: '${user.icon}';
-                                }
-                            }
-                        `;
-            })
-            .join('\n')};
-    }
-`;
 
 // https://www.npmjs.com/package/react-leaflet-div-icon
 // https://www.npmjs.com/package/react-leaflet-locate-control

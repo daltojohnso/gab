@@ -1,23 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import classnames from 'classnames';
 import UserIcon from 'react-feather/dist/icons/user';
-import styled from 'styled-components';
 import {bindAll} from '~/util';
-
-const DropdownTrigger = styled.div`
-    height: 28px;
-    width: 28px;
-`;
-
-const StyledUserIcon = styled(UserIcon)`
-    height: 28px;
-    width: 28px;
-    border-radius: 50%;
-    cursor: pointer;
-    color: #363636;
-    background-color: whitesmoke;
-`;
 
 class UserButton extends React.Component {
     constructor (props) {
@@ -43,7 +28,7 @@ class UserButton extends React.Component {
     }
 
     onBlur () {
-        // lets the next focus event fire
+        // lets the next focus event fire before closing the dropdown
         setTimeout(() => {
             this.setState({
                 isActive: false
@@ -52,7 +37,8 @@ class UserButton extends React.Component {
     }
 
     onFocus () {
-        // puts the focus event after the state setting in `onBlur`
+        // puts the focus event AFTER the state setting in `onBlur`
+        // so that we can keep the dropdown open when focus is on the sign out button.
         setTimeout(() => {
             this.setState({
                 isActive: true
@@ -63,17 +49,24 @@ class UserButton extends React.Component {
     onKeyUpToggle (e) {
         const key = e.key;
         this.setState(prevState => {
-            return key === 'Enter'
-                ? {
-                    isActive: !prevState.isActive
-                }
-                : {};
+            if (key === 'Enter') {
+                return {isActive: !prevState.isActive};
+            } else if (key === 'Escape') {
+                return {isActive: false};
+            } else {
+                return {};
+            }
         });
     }
 
     onKeyUpSignOut (e) {
-        if (e.key === 'Enter') {
+        const {key} = e;
+        if (key === 'Enter') {
             this.props.onSignOut();
+        } else if (key === 'Escape') {
+            this.setState({
+                isActive: false
+            });
         }
     }
 
@@ -82,38 +75,31 @@ class UserButton extends React.Component {
         const {
             user: {displayName, email}
         } = this.props;
+
         return (
-            <div className={classNames(this.props.className)}>
+            <div className={classnames('relative', this.props.className)}>
                 <div
-                    className={classNames('dropdown', 'is-right', {
-                        'is-active': isActive
-                    })}
+                    className="cursor-pointer w-10 h-10 shadow-md border border-indigo rounded-full bg-white flex justify-center items-center"
                     tabIndex="0"
                     onClick={this.onToggle}
                     onKeyUp={this.onKeyUpToggle}
-                    onBlur={this.onBlur}
-                >
-                    <DropdownTrigger className="dropdown-trigger">
-                        <StyledUserIcon />
-                    </DropdownTrigger>
-                    <div className="dropdown-menu" role="menu">
-                        <div className="dropdown-content">
-                            <div className="dropdown-item">
-                                {displayName || email}
-                            </div>
-                            <hr className="dropdown-divider" />
-                            <a
-                                className="dropdown-item"
-                                tabIndex="0"
-                                onClick={this.onSignOut}
-                                onFocus={this.onFocus}
-                                onBlur={this.onBlur}
-                                onKeyUp={this.onKeyUpSignOut}
-                            >
-                                Sign out
-                            </a>
-                        </div>
+                    onBlur={this.onBlur}>
+                    <UserIcon className="h-7 w-7 text-indigo" />
+                </div>
+                <div
+                    className={classnames({hidden: !isActive}, 'absolute pin-none pin-r bg-white opacity-90 shadow rounded border overflow-hidden mt-1')}>
+                    <div className="p-4 border border-t-0 border-r-0 border-l-0 border-b-1 w-full">
+                        {displayName || email}
                     </div>
+                    <a
+                        className="m-1 p-3 hover:bg-grey-lighter text-black block w-auto"
+                        tabIndex="0"
+                        onClick={this.onSignOut}
+                        onFocus={this.onFocus}
+                        onBlur={this.onBlur}
+                        onKeyUp={this.onKeyUpSignOut}>
+                        Sign out
+                    </a>
                 </div>
             </div>
         );

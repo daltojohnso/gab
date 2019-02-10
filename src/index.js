@@ -1,11 +1,12 @@
+import '@babel/polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
 import {App} from '~/pages';
 import store from './store';
 import './firebase';
-import 'bulma/css/bulma.css';
 import 'leaflet/dist/leaflet.css';
+import './styles.css';
 import L from 'leaflet';
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),

@@ -33,3 +33,18 @@ export function getDataWithId (docs) {
         return data;
     });
 }
+
+export const EDITOR_STATES = {
+    edit: 'edit',
+    delete: 'delete',
+    confirmDelete: 'confirmDelete',
+    move: 'move',
+    saveNewLocation: 'saveNewLocation',
+    focus: 'focus',
+    close: 'close',
+    closeEdited: 'closeEdited',
+    confirmClose: 'confirmClose',
+    save: 'save',
+    empty: 'empty',
+    lock: 'lock'
+};

@@ -8,11 +8,16 @@
         html, body, #app {
             height: 100%;
             width: 100%;
+            overflow: auto;
+        }
+
+        button:focus, div:focus, a:focus, input:focus {
+            outline-width: 3px !important;
         }
     </style>
   </head>
   <body>
-  <div id="app">
-  </div>
-  <noscript>gab requires JavaScript to be enabled.</noscript>
+      <div id="app"></div>
+      <noscript>gab requires JavaScript to be enabled.</noscript>
+  </body>
 </html>

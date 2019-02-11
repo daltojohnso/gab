@@ -21,6 +21,8 @@ class MainView extends React.Component {
         this.onMapClick = this.onMapClick.bind(this);
         this.onMarkerClick = this.onMarkerClick.bind(this);
         this.onNoteChange = this.onNoteChange.bind(this);
+        this.openMapsList = this.openMapsList.bind(this);
+        this.openNotesList = this.openNotesList.bind(this);
     }
 
     componentDidMount () {
@@ -106,12 +108,21 @@ class MainView extends React.Component {
         });
     }
 
+    openMapsList () {}
+
+    openNotesList () {
+
+    }
+
     render () {
         const {selectedNote} = this.state;
         const {notes, usersById} = this.props;
         return (
             <React.Fragment>
-                <NavBar />
+                <NavBar
+                    onMapsClick={this.openMapsList}
+                    onNotesClick={this.openNotesList}}
+                />
                 <main className="w-full h-full">
                     <MarkerMap
                         onMapClick={this.onMapClick}

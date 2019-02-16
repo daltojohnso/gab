@@ -12,14 +12,18 @@ const NavBar = ({isLoading, onNotesClick, onMapsClick}) => (
                 <Loader className="text-grey-dark"/>
             </div>
         )}
-        <div className="cursor-pointer m-3 w-10 h-10 shadow-md border border-pink rounded-full bg-white flex justify-center items-center"
-            onClick={onNotesClick}>
-            <BookOpenIcon className="w-7 h-7 text-pink" />
-        </div>
-        <div className="cursor-pointer m-3 w-10 h-10 shadow-md border border-teal bg-white rounded-full flex justify-center items-center"
-            onClick={onMapsClick}>
-            <MapIcon className="w-7 h-7 text-teal" />
-        </div>
+        {false && (
+            <div className="cursor-pointer m-3 w-10 h-10 shadow-md border border-pink rounded-full bg-white flex justify-center items-center"
+                onClick={onNotesClick}>
+                <BookOpenIcon className="w-7 h-7 text-pink" />
+            </div>
+        )}
+        {false && (
+            <div className="cursor-pointer m-3 w-10 h-10 shadow-md border border-teal bg-white rounded-full flex justify-center items-center"
+                onClick={onMapsClick}>
+                <MapIcon className="w-7 h-7 text-teal" />
+            </div>
+        )}
         <UserButton className="m-3" />
     </div>
 );

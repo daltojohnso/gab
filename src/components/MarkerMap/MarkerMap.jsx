@@ -6,6 +6,11 @@ import {GeoPoint} from '~/firebase';
 import noop from 'lodash/noop';
 import L from 'leaflet';
 import MapPinBlue from '~/img/map-pin-blue.svg';
+import MapPinPink from '~/img/map-pin-pink.svg';
+
+function getPinForUser (user) {
+    return user.uid === 'jZXROJJc0WRfukCsrosdvvanLRT2' ? MapPinPink : MapPinBlue;
+}
 
 class MarkerMap extends React.Component {
     constructor (props) {
@@ -41,14 +46,14 @@ class MarkerMap extends React.Component {
     createMarker (note, usersById, fakeId) {
         const {
             id,
-            // createdBy,
+            createdBy,
             location: {latitude, longitude}
         } = note;
         const position = [latitude, longitude];
-        // const user = usersById[createdBy];
+        const user = usersById[createdBy];
 
         const icon = new L.Icon({
-            iconUrl: MapPinBlue,
+            iconUrl: getPinForUser(user),
             className: 'gab--leaflet-icon text-black h-7 w-7'
         });
 

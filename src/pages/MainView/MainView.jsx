@@ -121,7 +121,7 @@ class MainView extends React.Component {
             <React.Fragment>
                 <NavBar
                     onMapsClick={this.openMapsList}
-                    onNotesClick={this.openNotesList}}
+                    onNotesClick={this.openNotesList}
                 />
                 <main className="w-full h-full">
                     <MarkerMap

@@ -62,7 +62,7 @@ const notes = (state = initState, action) => {
         case 'notes/resetState':
             return {
                 ...state,
-                status: 'resolved'  // or just ''?
+                status: 'resolved'
             };
         default:
             return state;

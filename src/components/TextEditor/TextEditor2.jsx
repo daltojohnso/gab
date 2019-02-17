@@ -232,13 +232,13 @@ class TextEditor extends React.Component {
 
     render () {
         const {editorState, footer, isReadOnly, isNew, isEditing} = this.state;
-        const {isLoading} = this.props;
+        const {noteStatus} = this.props;
         const footerState = footer.override || footer.current;
 
         return (
             <div className="h-inherit flex flex-col ">
                 <div className="p-1 select-none flex-no-grow flex justify-between leading-zero">
-                    <div className={classnames({invisible: !isLoading}, 'p-1 text-grey-darkest')}>
+                    <div className={classnames({invisible: noteStatus !== 'loading'}, 'p-1 text-grey-darkest')}>
                         <Loader className="" />
                     </div>
                     <div className="flex">
@@ -310,13 +310,12 @@ class TextEditor extends React.Component {
 TextEditor.propTypes = {
     note: PropTypes.object,
     onChange: PropTypes.func,
-    isLoading: PropTypes.bool
+    noteStatus: PropTypes.string
 };
 
 TextEditor.defaultProps = {
     note: {},
-    onChange: noop,
-    isLoading: false
+    onChange: noop
 };
 
 export default TextEditor;

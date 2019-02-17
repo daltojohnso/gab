@@ -113,7 +113,7 @@ class MainView extends React.Component {
 
     render () {
         const {selectedNote} = this.state;
-        const {notes, usersById, pinMap} = this.props;
+        const {notes, usersById, pinMap, noteStatus} = this.props;
         return (
             <React.Fragment>
                 <NavBar
@@ -133,6 +133,7 @@ class MainView extends React.Component {
                         <FloatingTextEditor2
                             onChange={this.onNoteChange}
                             note={selectedNote}
+                            noteStatus={noteStatus}
                         />
                     )}
                 </main>
@@ -149,7 +150,7 @@ MainView.propTypes = {
     user: PropTypes.object,
     saveNote: PropTypes.func,
     deleteNote: PropTypes.func,
-    notesStatus: PropTypes.bool
+    noteStatus: PropTypes.bool
 };
 
 export default MainView;

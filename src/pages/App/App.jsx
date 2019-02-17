@@ -1,6 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {Login, NavView} from '~/pages';
+import {Login, NavView, AnonLogin} from '~/pages';
 import PropTypes from 'prop-types';
 import {
     BrowserRouter as Router,
@@ -28,14 +28,14 @@ Authed.propTypes = {
     isLoggedIn: PropTypes.bool
 };
 
-const Unauthed = ({component: Component, isLoggedIn, ...rest}) => (
+const Unauthed = ({component: Component, isLoggedIn, isAnon, ...rest}) => (
     <Route
         {...rest}
         render={p =>
             isLoggedIn ? (
                 <Redirect to={{pathname: '/', state: {from: p.location}}} />
             ) : (
-                <Component {...p} />
+                <Component {...p} isAnon={isAnon} />
             )
         }
     />
@@ -55,6 +55,13 @@ class App extends React.Component {
                         path="/login"
                         component={Login}
                         isLoggedIn={this.props.isLoggedIn}
+                    />
+                    <Unauthed
+                        exact
+                        path="/anon"
+                        component={Login}
+                        isLoggedIn={this.props.isLoggedIn}
+                        isAnon={true}
                     />
                     <Authed
                         path="/"

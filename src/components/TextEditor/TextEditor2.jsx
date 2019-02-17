@@ -68,6 +68,15 @@ const Footer = ({state, onClick}) => {
     }
 };
 
+Footer.propTypes = {
+    state: PropTypes.string,
+    onClick: PropTypes.func
+};
+
+Footer.defaultProps = {
+    onClick: noop
+};
+
 function getEditorState (note) {
     let contentState;
     if (note) {

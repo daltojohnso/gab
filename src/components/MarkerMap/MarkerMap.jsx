@@ -9,15 +9,20 @@ import MapPinBlue from '~/img/map-pin-blue.svg';
 import MapPinPink from '~/img/map-pin-pink.svg';
 
 function getPinForUser (user) {
-    return user.uid === 'jZXROJJc0WRfukCsrosdvvanLRT2' ? MapPinPink : MapPinBlue;
+    return user.iconColor === 'pink' ? MapPinPink : MapPinBlue;
 }
 
 class MarkerMap extends React.Component {
     constructor (props) {
         super(props);
+        // var corner1 = L.latLng(30.8077094,-83.2552247),
+        //     corner2 = L.latLng(30.8712524,-83.3765805),
+        //     bounds = L.latLngBounds(corner1, corner2);
+
         this.state = {
             position: [30, -50],
-            zoom: 3
+            zoom: 3,
+            bounds: undefined
         };
 
         this.mapRef = React.createRef();
@@ -75,7 +80,7 @@ class MarkerMap extends React.Component {
     }
 
     render () {
-        const {position, zoom} = this.state;
+        const {position, zoom, bounds} = this.state;
         const {selectedNote, notes, usersById} = this.props;
 
         const filteredNotes = selectedNote
@@ -103,6 +108,7 @@ class MarkerMap extends React.Component {
                 ref={this.mapRef}
                 onViewportChange={this.onViewportChange}
                 onClick={this.onClick}
+                bounds={bounds}
             >
                 <TileLayer
                     attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"

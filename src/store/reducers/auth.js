@@ -14,6 +14,15 @@ const auth = (state = initState, action) => {
                 ...state,
                 user: action.user
             };
+        case 'auth/isAnon':
+            return {
+                ...state,
+                user: {
+                    isAnon: true,
+                    displayName: 'Anonymous',
+                    uid: 'anon'
+                }
+            };
         default:
             return state;
     }

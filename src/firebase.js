@@ -21,7 +21,11 @@ firebase.auth().onAuthStateChanged(user => {
         };
     }
 
-    store.dispatch({type: 'auth/userChanged', user: currentUser});
+    if (currentUser && currentUser.isAnonymous) {
+        store.dispatch({type: 'auth/isAnon'});
+    } else {
+        store.dispatch({type: 'auth/userChanged', user: currentUser});
+    }
     store.dispatch({type: 'auth/isReady'});
 });
 

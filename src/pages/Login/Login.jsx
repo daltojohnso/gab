@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {loginWithEmailAndPassword} from '~/store/actions/auth';
+import {loginWithEmailAndPassword, loginAnonymously} from '~/store/actions/auth';
 import {bindAll} from '~/util';
 
 class LoginForm extends React.Component {
-    constructor () {
-        super();
+    constructor (props) {
+        super(props);
+
         this.state = {
             email: '',
             password: ''
@@ -87,6 +88,14 @@ LoginForm.propTypes = {
 };
 
 class Login extends React.Component {
+    constructor (props) {
+        super(props);
+
+        if (props.isAnon) {
+            props.loginAnonymously();
+        }
+    }
+
     render () {
         return (
             <main className="w-screen flex justify-center py-16">
@@ -102,7 +111,9 @@ class Login extends React.Component {
 
 Login.propTypes = {
     loginWithEmailAndPassword: PropTypes.func,
-    isLoggedIn: PropTypes.bool
+    loginAnonymously: PropTypes.func,
+    isLoggedIn: PropTypes.bool,
+    isAnon: PropTypes.bool
 };
 
 const mapStateToProps = state => ({
@@ -111,7 +122,10 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
     loginWithEmailAndPassword: (email, password) =>
-        dispatch(loginWithEmailAndPassword(email, password))
+        dispatch(loginWithEmailAndPassword(email, password)),
+    loginAnonymously: () => {
+        dispatch(loginAnonymously());
+    }
 });
 
 export default connect(

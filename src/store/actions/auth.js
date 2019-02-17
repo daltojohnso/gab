@@ -55,3 +55,22 @@ export function firebaseSignInWithEmailAndPassword (email, password) {
 export function firebaseSignOut () {
     return firebase.auth().signOut();
 }
+
+export const loginAnonymously = () => {
+    return dispatch => {
+        dispatch(signingIn());
+        return firebaseLoginAnonymously().then(() => {
+            dispatch({type: 'auth/isAnon'});
+            dispatch(signedIn());
+        });
+    };
+};
+
+export function firebaseLoginAnonymously () {
+    return firebase
+        .auth()
+        .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+        .then(() => {
+            return firebase.auth().signInAnonymously();
+        });
+}

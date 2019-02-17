@@ -13,7 +13,8 @@ const mapStateToProps = state => {
         selectedMapId,
         notes: filter(values(state.notes.byId), {mapId: selectedMapId}),
         usersById: state.users.byId,
-        user: state.auth.user
+        user: state.auth.user,
+        isAnon: state.auth.user.isAnon
     };
 };
 

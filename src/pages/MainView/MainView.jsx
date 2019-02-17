@@ -18,16 +18,13 @@ class MainView extends React.Component {
             editorState: undefined
         };
 
+        props.fetch();
+
         this.onMapClick = this.onMapClick.bind(this);
         this.onMarkerClick = this.onMarkerClick.bind(this);
         this.onNoteChange = this.onNoteChange.bind(this);
         this.openMapsList = this.openMapsList.bind(this);
         this.openNotesList = this.openNotesList.bind(this);
-    }
-
-    componentDidMount () {
-        const mapId = get(this.props, 'match.params.mapId');
-        this.props.fetch(mapId);
     }
 
     onMapClick (location) {
@@ -116,7 +113,7 @@ class MainView extends React.Component {
 
     render () {
         const {selectedNote} = this.state;
-        const {notes, usersById} = this.props;
+        const {notes, usersById, pinMap} = this.props;
         return (
             <React.Fragment>
                 <NavBar
@@ -130,6 +127,7 @@ class MainView extends React.Component {
                         selectedNote={selectedNote}
                         notes={notes}
                         usersById={usersById}
+                        pinMap={pinMap}
                     />
                     {selectedNote && (
                         <FloatingTextEditor2

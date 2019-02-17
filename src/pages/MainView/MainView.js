@@ -9,6 +9,7 @@ import values from 'lodash/values';
 const mapStateToProps = state => {
     const selectedMapId = state.maps.selectedMapId;
     return {
+        isLoading: state.nav.status === 'loading',
         noteStatus: state.notes.status,
         selectedMapId,
         notes: filter(values(state.notes.byId), {mapId: selectedMapId}),

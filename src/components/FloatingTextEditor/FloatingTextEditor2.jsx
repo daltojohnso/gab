@@ -11,6 +11,7 @@ const AbsolutePositioningDiv = styled.div`
         left: 0;
         top: 64px;
         height: calc(100% - 64px);
+        z-index: 1001 !important;
     }
 `;
 

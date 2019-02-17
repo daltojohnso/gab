@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {NavBar, MarkerMap, FloatingTextEditor2} from '~/components';
-import get from 'lodash/get';
 import {EDITOR_STATES} from '~/util';
 
 const STATES = {
@@ -28,6 +27,8 @@ class MainView extends React.Component {
     }
 
     onMapClick (location) {
+        if (this.props.isLoading) return;
+
         const {selectedNote, editorState} = this.state;
         if (editorState === STATES.moving) {
             this.setState({
@@ -108,7 +109,6 @@ class MainView extends React.Component {
     openMapsList () {}
 
     openNotesList () {
-
     }
 
     render () {
@@ -150,7 +150,8 @@ MainView.propTypes = {
     user: PropTypes.object,
     saveNote: PropTypes.func,
     deleteNote: PropTypes.func,
-    noteStatus: PropTypes.string
+    noteStatus: PropTypes.string,
+    isLoading: PropTypes.bool
 };
 
 export default MainView;

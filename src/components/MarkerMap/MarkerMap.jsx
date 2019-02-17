@@ -7,6 +7,15 @@ import noop from 'lodash/noop';
 import L from 'leaflet';
 import MapPinBlue from '~/img/map-pin-blue.svg';
 import MapPinPink from '~/img/map-pin-pink.svg';
+import styled from 'styled-components';
+
+const MapWrapper = styled.div`
+    @media screen and (max-width: 767px) {
+        .leaflet-left .leaflet-control-zoom {
+            display: flex;
+        }
+    }
+`;
 
 function getPinForUser (user) {
     return user.iconColor === 'pink' ? MapPinPink : MapPinBlue;
@@ -99,24 +108,26 @@ class MarkerMap extends React.Component {
         );
 
         return (
-            <Map
-                animate={true}
-                style={{height: '100%', width: '100%'}}
-                center={position}
-                zoom={zoom}
-                worldCopyJump={true}
-                ref={this.mapRef}
-                onViewportChange={this.onViewportChange}
-                onClick={this.onClick}
-                bounds={bounds}
-            >
-                <TileLayer
-                    attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                {pendingMarker}
-                {markers}
-            </Map>
+            <MapWrapper className="h-full w-full">
+                <Map
+                    animate={true}
+                    style={{height: '100%', width: '100%'}}
+                    center={position}
+                    zoom={zoom}
+                    worldCopyJump={true}
+                    ref={this.mapRef}
+                    onViewportChange={this.onViewportChange}
+                    onClick={this.onClick}
+                    bounds={bounds}
+                >
+                    <TileLayer
+                        attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    {pendingMarker}
+                    {markers}
+                </Map>
+            </MapWrapper>
         );
     }
 }

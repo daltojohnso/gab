@@ -150,7 +150,7 @@ MainView.propTypes = {
     user: PropTypes.object,
     saveNote: PropTypes.func,
     deleteNote: PropTypes.func,
-    noteStatus: PropTypes.bool
+    noteStatus: PropTypes.string
 };
 
 export default MainView;

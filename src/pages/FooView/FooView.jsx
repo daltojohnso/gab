@@ -6,7 +6,6 @@ class FooView extends React.Component {
         return (
             <main>
                 <FloatingTextEditor2 />
-                <FloatingTextEditor />
             </main>
         );
     }

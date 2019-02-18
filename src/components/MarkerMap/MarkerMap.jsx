@@ -35,7 +35,10 @@ class MarkerMap extends React.Component {
         };
 
         this.mapRef = React.createRef();
-        bindAll(this, ['onViewportChange', 'onClick']);
+        this.onViewportChange = this.onViewportChange.bind(this);
+        this.onClick = this.onClick.bind(this);
+        this.onMarkerClick = this.onMarkerClick.bind(this);
+        this.onMarkerKeyUp = this.onMarkerKeyUp.bind(this);
     }
 
     // TODO: normalize lat, lng for super-far-away map clicks
@@ -49,7 +52,17 @@ class MarkerMap extends React.Component {
         });
     }
 
-    onMarkerClick (id, position) {
+    // this doesn't work yet as of 1.4.0
+    onMarkerKeyUp (e) {
+        if (e.key === 'Enter') {
+            this.onMarkerClick(e);
+        }
+    }
+
+    onMarkerClick (e) {
+        const {target: {options: {hasFakeId, realId: id, position}}} = e;
+        if (hasFakeId) return;
+
         this.props.onMarkerClick(id);
         setTimeout(() => {
             this.mapRef.current.leafletElement.invalidateSize();
@@ -77,9 +90,10 @@ class MarkerMap extends React.Component {
                 key={id || fakeId}
                 position={position}
                 tabindex="0"
-                onClick={() =>
-                    fakeId ? null : this.onMarkerClick(id, position)
-                }
+                realId={id}
+                hasFakeId={!!fakeId}
+                onClick={this.onMarkerClick}
+                onKeyUp={this.onMarkerKeyUp}
             />
         );
     }

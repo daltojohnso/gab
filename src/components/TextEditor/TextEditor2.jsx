@@ -243,7 +243,7 @@ class TextEditor extends React.Component {
                     </div>
                     <div className="flex">
                         {!isNew && isReadOnly && (
-                            <div className="p-1 mr-0 text-grey hover:text-grey-darker cursor-pointer active:text-black"
+                            <div className="p-1 mr-0 text-grey-darker cursor-pointer active:text-black"
                                 tabIndex="0"
                                 onMouseOver={() => this.updateFooter(EDITOR_STATES.edit)}
                                 onMouseOut={() => this.updateFooter()}
@@ -252,7 +252,7 @@ class TextEditor extends React.Component {
                             </div>
                         )}
                         {!isNew && (
-                            <div className="p-1 mr-0 text-grey hover:text-grey-darker cursor-pointer active:text-black"
+                            <div className="p-1 mr-0 text-grey-darker cursor-pointer active:text-black"
                                 tabIndex="0"
                                 onMouseOver={() => this.updateFooter(EDITOR_STATES.delete)}
                                 onMouseOut={() => this.updateFooter()}
@@ -261,7 +261,7 @@ class TextEditor extends React.Component {
                             </div>
                         )}
                         {!isNew && (
-                            <div className="p-1 mr-0 text-grey hover:text-grey-darker cursor-pointer active:text-black"
+                            <div className="p-1 mr-0 text-grey-darker cursor-pointer active:text-black"
                                 tabIndex="0"
                                 onMouseOver={() => this.updateFooter(EDITOR_STATES.move)}
                                 onMouseOut={() => this.updateFooter()}
@@ -270,7 +270,7 @@ class TextEditor extends React.Component {
                             </div>
                         )}
                         {false && (
-                            <div className="p-1 mr-0 text-grey hover:text-grey-darker cursor-pointer active:text-black"
+                            <div className="p-1 mr-0 text-grey-darker cursor-pointer active:text-black"
                                 tabIndex="0"
                                 onMouseOver={() => this.updateFooter(EDITOR_STATES.focus)}
                                 onMouseOut={() => this.updateFooter()}
@@ -278,7 +278,7 @@ class TextEditor extends React.Component {
                                 <FocusIcon className="" />
                             </div>
                         )}
-                        <div className="p-1 text-grey hover:text-grey-darker cursor-pointer active:text-black"
+                        <div className="p-1 text-grey-darker cursor-pointer active:text-black"
                             tabIndex="0"
                             onMouseOver={() => this.updateFooter(isEditing ? EDITOR_STATES.closeEdited : EDITOR_STATES.close)}
                             onMouseOut={() => this.updateFooter()}

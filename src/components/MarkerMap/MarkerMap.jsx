@@ -81,7 +81,9 @@ class MarkerMap extends React.Component {
 
         const icon = new L.Icon({
             iconUrl: getPinForUser(user),
-            className: 'gab--leaflet-icon text-black h-7 w-7'
+            className: 'gab--leaflet-icon text-black h-7 w-7',
+            iconSize: [24, 24],
+            iconAnchor: [12, 24]
         });
 
         return (

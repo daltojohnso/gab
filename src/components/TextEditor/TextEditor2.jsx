@@ -235,6 +235,9 @@ class TextEditor extends React.Component {
         const {noteStatus} = this.props;
         const footerState = footer.override || footer.current;
 
+        // use e.whatevs.options and put the state on the div and then use the same callback for each
+        // don't add if mobile.
+
         return (
             <div className="h-inherit flex flex-col ">
                 <div className="p-1 select-none flex-no-grow flex justify-between leading-zero">
@@ -245,8 +248,6 @@ class TextEditor extends React.Component {
                         {!isNew && isReadOnly && (
                             <div className="p-1 mr-0 text-grey-darker cursor-pointer active:text-black"
                                 tabIndex="0"
-                                onMouseOver={() => this.updateFooter(EDITOR_STATES.edit)}
-                                onMouseOut={() => this.updateFooter()}
                                 onClick={() => this.onClick(EDITOR_STATES.edit)}>
                                 <EditIcon className="" />
                             </div>
@@ -254,8 +255,6 @@ class TextEditor extends React.Component {
                         {!isNew && (
                             <div className="p-1 mr-0 text-grey-darker cursor-pointer active:text-black"
                                 tabIndex="0"
-                                onMouseOver={() => this.updateFooter(EDITOR_STATES.delete)}
-                                onMouseOut={() => this.updateFooter()}
                                 onClick={() => this.updateFooter(EDITOR_STATES.confirmDelete, 3000)}>
                                 <TrashIcon className="" />
                             </div>
@@ -263,8 +262,6 @@ class TextEditor extends React.Component {
                         {!isNew && (
                             <div className="p-1 mr-0 text-grey-darker cursor-pointer active:text-black"
                                 tabIndex="0"
-                                onMouseOver={() => this.updateFooter(EDITOR_STATES.move)}
-                                onMouseOut={() => this.updateFooter()}
                                 onClick={() => this.onClick(EDITOR_STATES.move)}>
                                 <MoveIcon className="" />
                             </div>
@@ -272,16 +269,12 @@ class TextEditor extends React.Component {
                         {false && (
                             <div className="p-1 mr-0 text-grey-darker cursor-pointer active:text-black"
                                 tabIndex="0"
-                                onMouseOver={() => this.updateFooter(EDITOR_STATES.focus)}
-                                onMouseOut={() => this.updateFooter()}
                                 onClick={() => this.onClick(EDITOR_STATES.focus)}>
                                 <FocusIcon className="" />
                             </div>
                         )}
                         <div className="p-1 text-grey-darker cursor-pointer active:text-black"
                             tabIndex="0"
-                            onMouseOver={() => this.updateFooter(isEditing ? EDITOR_STATES.closeEdited : EDITOR_STATES.close)}
-                            onMouseOut={() => this.updateFooter()}
                             onClick={() => isEditing ? this.updateFooter(EDITOR_STATES.confirmClose, 3000) : this.onClick(EDITOR_STATES.confirmClose)}>
                             <CloseIcon className="" />
                         </div>

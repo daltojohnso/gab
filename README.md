@@ -1,2 +1,2 @@
-# gab
-https://gabgab.co/anon
+# mappy-map
+https://mappymap.app/anon

@@ -1,5 +1,5 @@
 import config from './firebase-config';
-import firebase from 'firebase/app';
+import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 import 'firebase/auth';
 
@@ -22,11 +22,11 @@ firebase.auth().onAuthStateChanged(user => {
     }
 
     if (currentUser && currentUser.isAnonymous) {
-        store.dispatch({type: 'auth/isAnon'});
+        store.dispatch({ type: 'auth/isAnon' });
     } else {
-        store.dispatch({type: 'auth/userChanged', user: currentUser});
+        store.dispatch({ type: 'auth/userChanged', user: currentUser });
     }
-    store.dispatch({type: 'auth/isReady'});
+    store.dispatch({ type: 'auth/isReady' });
 });
 
 export const GeoPoint = firebase.firestore.GeoPoint;

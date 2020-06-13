@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import UserIcon from 'react-feather/dist/icons/user';
-import {bindAll} from '~/util';
+import { bindAll } from '~/util';
 
 class UserButton extends React.Component {
     constructor (props) {
@@ -17,7 +17,7 @@ class UserButton extends React.Component {
             'onFocus',
             'onKeyUpToggle',
             'onKeyUpSignOut',
-            {onSignOut: 'props.onSignOut'}
+            { onSignOut: 'props.onSignOut' }
         ]);
     }
 
@@ -50,9 +50,9 @@ class UserButton extends React.Component {
         const key = e.key;
         this.setState(prevState => {
             if (key === 'Enter') {
-                return {isActive: !prevState.isActive};
+                return { isActive: !prevState.isActive };
             } else if (key === 'Escape') {
-                return {isActive: false};
+                return { isActive: false };
             } else {
                 return {};
             }
@@ -60,7 +60,7 @@ class UserButton extends React.Component {
     }
 
     onKeyUpSignOut (e) {
-        const {key} = e;
+        const { key } = e;
         if (key === 'Enter') {
             this.props.onSignOut();
         } else if (key === 'Escape') {
@@ -71,9 +71,9 @@ class UserButton extends React.Component {
     }
 
     render () {
-        const {isActive} = this.state;
+        const { isActive } = this.state;
         const {
-            user: {displayName, email}
+            user: { displayName, email }
         } = this.props;
 
         return (
@@ -83,11 +83,16 @@ class UserButton extends React.Component {
                     tabIndex="0"
                     onClick={this.onToggle}
                     onKeyUp={this.onKeyUpToggle}
-                    onBlur={this.onBlur}>
+                    onBlur={this.onBlur}
+                >
                     <UserIcon className="h-7 w-7 text-indigo" />
                 </div>
                 <div
-                    className={classnames({hidden: !isActive}, 'absolute pin-none pin-r bg-white opacity-90 shadow rounded border overflow-hidden mt-1')}>
+                    className={classnames(
+                        { hidden: !isActive },
+                        'absolute inset-auto right-0 bg-white opacity-90 shadow rounded border overflow-hidden mt-1'
+                    )}
+                >
                     <div className="p-4 border border-t-0 border-r-0 border-l-0 border-b-1 w-full">
                         {displayName || email}
                     </div>
@@ -97,7 +102,8 @@ class UserButton extends React.Component {
                         onClick={this.onSignOut}
                         onFocus={this.onFocus}
                         onBlur={this.onBlur}
-                        onKeyUp={this.onKeyUpSignOut}>
+                        onKeyUp={this.onKeyUpSignOut}
+                    >
                         Sign out
                     </a>
                 </div>

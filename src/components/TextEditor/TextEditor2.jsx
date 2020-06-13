@@ -7,13 +7,20 @@ import TrashIcon from 'react-feather/dist/icons/trash-2';
 import MoveIcon from 'react-feather/dist/icons/map-pin';
 import FocusIcon from 'react-feather/dist/icons/crosshair';
 // import BackArrowIcon from 'react-feather/dist/icons/corner-up-left';
-import {Loader} from '~/components';
-import {Editor, EditorState, RichUtils, ContentState, convertToRaw, convertFromRaw} from 'draft-js';
+import { Loader } from '~/components';
+import {
+    Editor,
+    EditorState,
+    RichUtils,
+    ContentState,
+    convertToRaw,
+    convertFromRaw
+} from 'draft-js';
 import 'draft-js/dist/Draft.css';
 import styled from 'styled-components';
 import noop from 'lodash/noop';
 import get from 'lodash/get';
-import {EDITOR_STATES} from '~/util';
+import { EDITOR_STATES } from '~/util';
 
 const EditorWrapper = styled.div`
     > .DraftEditor-root {
@@ -21,38 +28,68 @@ const EditorWrapper = styled.div`
     }
 `;
 
-const Footer = ({state, onClick}) => {
+const Footer = ({ state, onClick }) => {
     switch (state) {
         case EDITOR_STATES.edit:
-            return <button className="m-1 px-4 py-2 text-grey-darkest">Edit note?</button>;
+            return (
+                <button className="m-1 px-4 py-2 text-grey-darkest">
+                    Edit note?
+                </button>
+            );
         case EDITOR_STATES.delete:
-            return <button className="m-1 px-4 py-2 text-grey-darkest">Delete note?</button>;
+            return (
+                <button className="m-1 px-4 py-2 text-grey-darkest">
+                    Delete note?
+                </button>
+            );
         case EDITOR_STATES.confirmDelete:
             return (
-                <button className="m-1 px-4 py-2 hover:bg-grey-lighter text-grey-darkest active:bg-grey-light"
-                    onClick={() => onClick(EDITOR_STATES.confirmDelete)}>
+                <button
+                    className="m-1 px-4 py-2 hover:bg-grey-lighter text-grey-darkest active:bg-grey-light"
+                    onClick={() => onClick(EDITOR_STATES.confirmDelete)}
+                >
                     Click here to delete
                 </button>
             );
         case EDITOR_STATES.move:
-            return <button className="m-1 px-4 py-2 text-grey-darkest">Move note?</button>;
+            return (
+                <button className="m-1 px-4 py-2 text-grey-darkest">
+                    Move note?
+                </button>
+            );
         case EDITOR_STATES.saveNewLocation:
             return (
-                <button className="m-1 px-4 py-2 hover:bg-grey-lighter text-grey-darkest active:bg-grey-light"
-                    onClick={() => onClick(EDITOR_STATES.saveNewLocation)}>
+                <button
+                    className="m-1 px-4 py-2 hover:bg-grey-lighter text-grey-darkest active:bg-grey-light"
+                    onClick={() => onClick(EDITOR_STATES.saveNewLocation)}
+                >
                     Save new location
                 </button>
             );
         case EDITOR_STATES.focus:
-            return <button className="m-1 px-4 py-2 text-grey-darkest">Zoom in?</button>;
+            return (
+                <button className="m-1 px-4 py-2 text-grey-darkest">
+                    Zoom in?
+                </button>
+            );
         case EDITOR_STATES.close:
-            return <button className="m-1 px-4 py-2 text-grey-darkest">Close note?</button>;
+            return (
+                <button className="m-1 px-4 py-2 text-grey-darkest">
+                    Close note?
+                </button>
+            );
         case EDITOR_STATES.closeEdited:
-            return <button className="m-1 px-4 py-2 text-grey-darkest">Close note without saving?</button>;
+            return (
+                <button className="m-1 px-4 py-2 text-grey-darkest">
+                    Close note without saving?
+                </button>
+            );
         case EDITOR_STATES.confirmClose:
             return (
-                <button className="m-1 px-4 py-2 hover:bg-grey-lighter text-grey-darkest active:bg-grey-light"
-                    onClick={() => onClick(EDITOR_STATES.confirmClose)}>
+                <button
+                    className="m-1 px-4 py-2 hover:bg-grey-lighter text-grey-darkest active:bg-grey-light"
+                    onClick={() => onClick(EDITOR_STATES.confirmClose)}
+                >
                     Click here to close
                 </button>
             );
@@ -60,8 +97,10 @@ const Footer = ({state, onClick}) => {
             return null;
         default:
             return (
-                <button className="m-1 px-4 py-2 hover:bg-grey-lighter text-grey-darkest active:bg-grey-light"
-                    onClick={() => onClick(EDITOR_STATES.save)}>
+                <button
+                    className="m-1 px-4 py-2 hover:bg-grey-lighter text-grey-darkest active:bg-grey-light"
+                    onClick={() => onClick(EDITOR_STATES.save)}
+                >
                     Save
                 </button>
             );
@@ -99,7 +138,7 @@ function getDefaultFooterState (isNew) {
 class TextEditor extends React.Component {
     constructor (props) {
         super(props);
-        const {note} = props;
+        const { note } = props;
         const isNew = get(note, 'id') === undefined;
         this.state = {
             editorState: getEditorState(note),
@@ -112,8 +151,8 @@ class TextEditor extends React.Component {
         };
     }
 
-    componentDidUpdate ({note: oldNote}) {
-        const {note} = this.props;
+    componentDidUpdate ({ note: oldNote }) {
+        const { note } = this.props;
         if (get(oldNote, 'id') === get(note, 'id')) return;
         const isNew = get(note, 'id') === undefined;
         this.setState({
@@ -130,18 +169,25 @@ class TextEditor extends React.Component {
     updateFooter (newCurrent, timer) {
         this.setState(prevState => {
             const prevFooter = prevState.footer;
-            const override = (timer ? newCurrent : undefined) || prevFooter.override;
+            const override =
+                (timer ? newCurrent : undefined) || prevFooter.override;
 
             return {
-                footer: newCurrent ? {
-                    previous: timer ? prevFooter.previous : prevFooter.current,
-                    current: timer ? prevFooter.current : newCurrent,
-                    override
-                } : {
-                    override,
-                    previous: undefined,
-                    current: prevState.footer.previous || getDefaultFooterState(prevState.isNew)
-                }
+                footer: newCurrent
+                    ? {
+                        previous: timer
+                            ? prevFooter.previous
+                            : prevFooter.current,
+                        current: timer ? prevFooter.current : newCurrent,
+                        override
+                    }
+                    : {
+                        override,
+                        previous: undefined,
+                        current:
+                              prevState.footer.previous ||
+                              getDefaultFooterState(prevState.isNew)
+                    }
             };
         });
 
@@ -153,7 +199,8 @@ class TextEditor extends React.Component {
                     return {
                         footer: {
                             ...footer,
-                            override: override === newCurrent ? undefined : override
+                            override:
+                                override === newCurrent ? undefined : override
                         }
                     };
                 });
@@ -173,7 +220,7 @@ class TextEditor extends React.Component {
     }
 
     onEditorChange (editorState) {
-        this.setState({editorState});
+        this.setState({ editorState });
     }
 
     handleKeyCommand (command, editorState) {
@@ -191,7 +238,7 @@ class TextEditor extends React.Component {
                 this.onSave();
                 break;
             case EDITOR_STATES.edit:
-                this.setState({isReadOnly: false});
+                this.setState({ isReadOnly: false });
                 this.updateFooter(EDITOR_STATES.save);
                 break;
             case EDITOR_STATES.saveNewLocation:
@@ -210,12 +257,12 @@ class TextEditor extends React.Component {
     }
 
     onEditorFocus () {
-        this.setState({isEditing: true});
+        this.setState({ isEditing: true });
         this.props.onChange(EDITOR_STATES.lock);
     }
 
     onSave () {
-        const {editorState} = this.state;
+        const { editorState } = this.state;
         const currentContent = editorState.getCurrentContent();
         this.props.onChange(EDITOR_STATES.save, {
             message: currentContent.getPlainText(),
@@ -231,8 +278,14 @@ class TextEditor extends React.Component {
     }
 
     render () {
-        const {editorState, footer, isReadOnly, isNew, isEditing} = this.state;
-        const {noteStatus} = this.props;
+        const {
+            editorState,
+            footer,
+            isReadOnly,
+            isNew,
+            isEditing
+        } = this.state;
+        const { noteStatus } = this.props;
         const footerState = footer.override || footer.current;
 
         // use e.whatevs.options and put the state on the div and then use the same callback for each
@@ -240,42 +293,71 @@ class TextEditor extends React.Component {
 
         return (
             <div className="h-inherit flex flex-col ">
-                <div className="p-1 select-none flex-no-grow flex justify-between leading-zero">
-                    <div className={classnames({invisible: noteStatus !== 'loading'}, 'p-1 text-grey-darkest')}>
+                <div className="p-1 select-none flex-grow-0 flex justify-between leading-zero">
+                    <div
+                        className={classnames(
+                            { invisible: noteStatus !== 'loading' },
+                            'p-1 text-grey-darkest'
+                        )}
+                    >
                         <Loader className="" />
                     </div>
                     <div className="flex">
                         {!isNew && isReadOnly && (
-                            <div className="p-1 mr-0 text-grey-darker cursor-pointer active:text-black"
+                            <div
+                                className="p-1 mr-0 text-grey-darker cursor-pointer active:text-black"
                                 tabIndex="0"
-                                onClick={() => this.onClick(EDITOR_STATES.edit)}>
+                                onClick={() => this.onClick(EDITOR_STATES.edit)}
+                            >
                                 <EditIcon className="" />
                             </div>
                         )}
                         {!isNew && (
-                            <div className="p-1 mr-0 text-grey-darker cursor-pointer active:text-black"
+                            <div
+                                className="p-1 mr-0 text-grey-darker cursor-pointer active:text-black"
                                 tabIndex="0"
-                                onClick={() => this.updateFooter(EDITOR_STATES.confirmDelete, 3000)}>
+                                onClick={() =>
+                                    this.updateFooter(
+                                        EDITOR_STATES.confirmDelete,
+                                        3000
+                                    )
+                                }
+                            >
                                 <TrashIcon className="" />
                             </div>
                         )}
                         {!isNew && (
-                            <div className="p-1 mr-0 text-grey-darker cursor-pointer active:text-black"
+                            <div
+                                className="p-1 mr-0 text-grey-darker cursor-pointer active:text-black"
                                 tabIndex="0"
-                                onClick={() => this.onClick(EDITOR_STATES.move)}>
+                                onClick={() => this.onClick(EDITOR_STATES.move)}
+                            >
                                 <MoveIcon className="" />
                             </div>
                         )}
                         {false && (
-                            <div className="p-1 mr-0 text-grey-darker cursor-pointer active:text-black"
+                            <div
+                                className="p-1 mr-0 text-grey-darker cursor-pointer active:text-black"
                                 tabIndex="0"
-                                onClick={() => this.onClick(EDITOR_STATES.focus)}>
+                                onClick={() =>
+                                    this.onClick(EDITOR_STATES.focus)
+                                }
+                            >
                                 <FocusIcon className="" />
                             </div>
                         )}
-                        <div className="p-1 text-grey-darker cursor-pointer active:text-black"
+                        <div
+                            className="p-1 text-grey-darker cursor-pointer active:text-black"
                             tabIndex="0"
-                            onClick={() => isEditing ? this.updateFooter(EDITOR_STATES.confirmClose, 3000) : this.onClick(EDITOR_STATES.confirmClose)}>
+                            onClick={() =>
+                                isEditing
+                                    ? this.updateFooter(
+                                        EDITOR_STATES.confirmClose,
+                                        3000
+                                    )
+                                    : this.onClick(EDITOR_STATES.confirmClose)
+                            }
+                        >
                             <CloseIcon className="" />
                         </div>
                     </div>
@@ -290,9 +372,12 @@ class TextEditor extends React.Component {
                         handleKeyCommand={this.handleKeyCommand.bind(this)}
                     />
                 </EditorWrapper>
-                <div className="mr-4 flex-no-grow flex justify-center">
+                <div className="mr-4 flex-grow-0 flex justify-center">
                     <div className="px-8 border border-b-0 border-l-0 border-r-0 border-grey-lighter">
-                        <Footer state={footerState} onClick={() => this.onClick(footerState)} />
+                        <Footer
+                            state={footerState}
+                            onClick={() => this.onClick(footerState)}
+                        />
                     </div>
                 </div>
             </div>

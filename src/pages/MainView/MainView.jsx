@@ -1,7 +1,16 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import {NavBar, MarkerMap, FloatingTextEditor2} from '~/components';
-import {EDITOR_STATES} from '~/util';
+import React, { useState, useEffect } from 'react';
+import { NavBar, MarkerMap, FloatingTextEditor2 } from '~/components';
+import { EDITOR_STATES } from '~/util';
+import { useSelector, useDispatch, batch } from 'react-redux';
+import {
+    fetchMap,
+    fetchFirstMapAndNotes,
+    setSelectedMap
+} from '~/store/actions/maps';
+import { fetchNotes, saveNote, deleteNote } from '~/store/actions/notes';
+import { fetchUsersOfMap } from '~/store/actions/users';
+import filter from 'lodash/filter';
+import values from 'lodash/values';
 
 const STATES = {
     open: 'open',
@@ -9,149 +18,129 @@ const STATES = {
     moving: 'moving'
 };
 
-class MainView extends React.Component {
-    constructor (props) {
-        super(props);
-        this.state = {
-            selectedNote: undefined,
-            editorState: undefined
-        };
+const MainView = () => {
+    const [selectedNote, setSelectedNote] = useState(undefined);
+    const [editorState, setEditorState] = useState(undefined);
+    const dispatch = useDispatch();
+    const isLoading = useSelector(state => state.nav.status === 'loading');
+    const noteStatus = useSelector(state => state.notes.status);
+    const selectedMapId = useSelector(state => state.maps.selectedMapId);
+    const notes = useSelector(state =>
+        filter(values(state.notes.byId), { mapId: state.maps.selectedMapId })
+    );
+    const usersById = useSelector(state => state.users.byId);
+    const user = useSelector(state => state.auth.user);
+    const pinMap = useSelector(state => state.auth.user.isAnon === true);
 
-        props.fetch();
-
-        this.onMapClick = this.onMapClick.bind(this);
-        this.onMarkerClick = this.onMarkerClick.bind(this);
-        this.onNoteChange = this.onNoteChange.bind(this);
-        this.openMapsList = this.openMapsList.bind(this);
-        this.openNotesList = this.openNotesList.bind(this);
-    }
-
-    onMapClick (location) {
-        if (this.props.isLoading) return;
-
-        const {selectedNote, editorState} = this.state;
-        if (editorState === STATES.moving) {
-            this.setState({
-                selectedNote: {
-                    ...selectedNote,
-                    location
-                }
-            });
-        } else if (editorState !== STATES.editing) {
-            const newNote = {
-                location,
-                createdBy: this.props.user.uid
-            };
-            this.setState({
-                selectedNote: newNote,
-                editorState: STATES.open
+    useEffect(() => {
+        if (!selectedMapId) {
+            dispatch(fetchFirstMapAndNotes());
+        } else {
+            batch(() => {
+                dispatch(setSelectedMap(selectedMapId));
+                dispatch(fetchMap(selectedMapId)).then(() => {
+                    batch(() => {
+                        dispatch(fetchUsersOfMap(selectedMapId));
+                        dispatch(fetchNotes(selectedMapId));
+                    });
+                });
             });
         }
-    }
+    }, [dispatch, selectedMapId]);
 
-    onMarkerClick (id) {
-        const {editorState} = this.state;
-        if (editorState === STATES.editing || editorState === STATES.moving) return;
+    const onMapClick = location => {
+        if (isLoading) return;
 
-        const selectedNote = this.props.notes.find(note => note.id === id);
-        this.setState({
-            selectedNote,
-            editorState: STATES.open
-        });
-    }
+        if (editorState === STATES.moving) {
+            setSelectedNote({
+                ...selectedNote,
+                location
+            });
+        } else if (editorState !== STATES.editing) {
+            setSelectedNote({
+                location,
+                createdBy: user.uid
+            });
+            setEditorState(STATES.open);
+        }
+    };
 
-    onNoteChange (state, messageProps = {}) {
+    const onMarkerClick = id => {
+        if (editorState === STATES.editing || editorState === STATES.moving)
+            return;
+
+        const selectedNote = notes.find(note => note.id === id);
+        setSelectedNote(selectedNote);
+        setEditorState(STATES.open);
+    };
+
+    const closeEditor = () => {
+        setSelectedNote(undefined);
+        setEditorState(undefined);
+    };
+
+    const onSave = async messageProps => {
+        await dispatch(
+            saveNote(selectedMapId, {
+                ...selectedNote,
+                ...messageProps
+            })
+        );
+
+        if (editorState !== STATES.moving) {
+            closeEditor();
+        }
+    };
+
+    const onDelete = async () => {
+        dispatch(deleteNote(selectedNote.id));
+        closeEditor();
+    };
+
+    const onNoteChange = (state, messageProps = {}) => {
         switch (state) {
             case EDITOR_STATES.save:
-                this.onSave(messageProps);
+                onSave(messageProps);
                 break;
             case EDITOR_STATES.move:
-                this.setState({
-                    editorState: STATES.moving
-                });
+                setEditorState(STATES.moving);
                 break;
             case EDITOR_STATES.confirmDelete:
-                this.onDelete();
+                onDelete();
                 break;
             case EDITOR_STATES.confirmClose:
-                this.closeEditor();
+                closeEditor();
                 break;
             case EDITOR_STATES.focus:
                 break;
         }
-    }
+    };
 
-    async onSave (messageProps) {
-        const {selectedNote, editorState} = this.state;
-        await this.props.saveNote(this.props.selectedMapId, {
-            ...selectedNote,
-            ...messageProps
-        });
+    const openMapsList = () => {};
+    const openNotesList = () => {};
 
-        if (editorState !== STATES.moving) {
-            this.closeEditor();
-        }
-    }
-
-    async onDelete () {
-        const {selectedNote} = this.state;
-        await this.props.deleteNote(selectedNote.id);
-        this.closeEditor();
-    }
-
-    closeEditor () {
-        this.setState({
-            selectedNote: undefined,
-            editorState: undefined
-        });
-    }
-
-    openMapsList () {}
-
-    openNotesList () {
-    }
-
-    render () {
-        const {selectedNote} = this.state;
-        const {notes, usersById, pinMap, noteStatus} = this.props;
-        return (
-            <React.Fragment>
-                <NavBar
-                    onMapsClick={this.openMapsList}
-                    onNotesClick={this.openNotesList}
+    return (
+        <>
+            <NavBar onMapsClick={openMapsList} onNotesClick={openNotesList} />
+            <main className="w-full h-full">
+                <MarkerMap
+                    onMapClick={onMapClick}
+                    onMarkerClick={onMarkerClick}
+                    selectedNote={selectedNote}
+                    notes={notes}
+                    usersById={usersById}
+                    pinMap={pinMap}
                 />
-                <main className="w-full h-full">
-                    <MarkerMap
-                        onMapClick={this.onMapClick}
-                        onMarkerClick={this.onMarkerClick}
-                        selectedNote={selectedNote}
-                        notes={notes}
-                        usersById={usersById}
-                        pinMap={pinMap}
+                {selectedNote && (
+                    <FloatingTextEditor2
+                        onChange={onNoteChange}
+                        note={selectedNote}
+                        noteStatus={noteStatus}
                     />
-                    {selectedNote && (
-                        <FloatingTextEditor2
-                            onChange={this.onNoteChange}
-                            note={selectedNote}
-                            noteStatus={noteStatus}
-                        />
-                    )}
-                </main>
-            </React.Fragment>
-        );
-    }
-}
-
-MainView.propTypes = {
-    fetch: PropTypes.func,
-    selectedMapId: PropTypes.string,
-    notes: PropTypes.array,
-    usersById: PropTypes.object,
-    user: PropTypes.object,
-    saveNote: PropTypes.func,
-    deleteNote: PropTypes.func,
-    noteStatus: PropTypes.string,
-    isLoading: PropTypes.bool
+                )}
+            </main>
+        </>
+    );
 };
 
 export default MainView;

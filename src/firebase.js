@@ -4,30 +4,33 @@ import 'firebase/firestore';
 import 'firebase/auth';
 
 import store from '~/store';
+import { batch } from 'react-redux';
 
 firebase.initializeApp(config);
 export const db = firebase.firestore();
-
-firebase.auth().onAuthStateChanged(user => {
-    let currentUser = null;
-    if (user) {
-        currentUser = {
-            displayName: user.displayName,
-            email: user.email,
-            emailVerified: user.emailVerified,
-            uid: user.uid,
-            photoURL: user.photoURL,
-            isAnonymous: user.isAnonymous
-        };
-    }
-
-    if (currentUser && currentUser.isAnonymous) {
-        store.dispatch({ type: 'auth/isAnon' });
-    } else {
-        store.dispatch({ type: 'auth/userChanged', user: currentUser });
-    }
-    store.dispatch({ type: 'auth/isReady' });
-});
-
 export const GeoPoint = firebase.firestore.GeoPoint;
 export const Timestamp = firebase.firestore.Timestamp;
+
+firebase.auth().onAuthStateChanged(user => {
+    batch(() => {
+        if (!user) {
+            store.dispatch({ type: 'auth/userChanged', user: null });
+        } else if (user.isAnonymous) {
+            store.dispatch({ type: 'auth/isAnon' });
+        } else {
+            store.dispatch({
+                type: 'auth/userChanged',
+                user: {
+                    displayName: user.displayName,
+                    email: user.email,
+                    emailVerified: user.emailVerified,
+                    uid: user.uid,
+                    photoURL: user.photoURL,
+                    isAnonymous: user.isAnonymous
+                }
+            });
+        }
+
+        store.dispatch({ type: 'auth/isReady' });
+    });
+});

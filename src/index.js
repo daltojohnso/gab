@@ -1,8 +1,8 @@
 import '@babel/polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Provider} from 'react-redux';
-import {App} from '~/pages';
+import { Provider } from 'react-redux';
+import { App } from '~/pages';
 import store from './store';
 import './firebase';
 import 'leaflet/dist/leaflet.css';
@@ -13,6 +13,7 @@ L.Icon.Default.mergeOptions({
     iconUrl: require('leaflet/dist/images/marker-icon.png'),
     shadowUrl: require('leaflet/dist/images/marker-shadow.png')
 });
+
 ReactDOM.render(
     <Provider store={store}>
         <App />

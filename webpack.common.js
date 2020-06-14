@@ -14,21 +14,23 @@ module.exports = {
         alias: {
             '~': path.resolve(__dirname, 'src')
         },
-        extensions: ['*', '.js', '.jsx']
+        extensions: ['*', '.ts', '.tsx', '.js', '.jsx']
     },
     module: {
         rules: [
             {
-                test: /\.(js|jsx)$/,
+                test: /\.(t|j)sx?$/,
                 exclude: /node_modules/,
                 include: /src/,
                 use: {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: [['@babel/preset-env'], ['@babel/preset-react']],
-                        plugins: ['@babel/plugin-proposal-object-rest-spread', '@babel/plugin-transform-async-to-generator']
-                    }
+                    loader: 'ts-loader'
                 }
+            },
+            {
+                enforce: 'pre',
+                test: /\.js$/,
+                exclude: /node_modules/,
+                loader: 'source-map-loader'
             },
             {
                 test: /\.css$/,
@@ -46,7 +48,7 @@ module.exports = {
                 ]
             },
             // file-loader(for fonts)
-            {test: /\.(woff|woff2|eot|ttf|otf)$/, use: ['file-loader']}
+            { test: /\.(woff|woff2|eot|ttf|otf)$/, use: ['file-loader'] }
         ]
     },
     plugins: [

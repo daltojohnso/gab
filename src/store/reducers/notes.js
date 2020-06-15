@@ -59,11 +59,6 @@ const notes = (state = initState, action) => {
                 ...state,
                 status: 'rejected'
             };
-        case 'notes/resetState':
-            return {
-                ...state,
-                status: 'resolved'
-            };
         default:
             return state;
     }

@@ -1,74 +1,87 @@
-import {db} from '~/firebase';
+import { db } from '~/firebase';
 import flatten from 'lodash/flatten';
-import get from 'lodash/get';
 import firebase from 'firebase/app';
-import {fetchNotes} from './notes';
-import {fetchUsers} from './users';
-import nav from './nav';
-import {getDataWithId} from '~/util';
+import { fetchNotes } from './notes';
+import { fetchUsers, fetchUsersOfMap } from './users';
+import { getDataWithId, getUid } from '~/util';
 const FieldPath = firebase.firestore.FieldPath;
 
-export const fetchFirstMapAndNotes = () => {
-    return (dispatch, getState) => {
-        dispatch(nav.isLoading());
-        const uid = get(getState(), ['auth', 'user', 'uid']);
-        const sharedWithUid = new FieldPath('sharedWith', uid);
-        return db
-            .collection('maps')
-            .where(sharedWithUid, '==', true)
-            .limit(1)
-            .get()
-            .then(snapshot => {
-                // resolve nav in fetchNotes
-                const maps = getDataWithId(snapshot.docs);
-                dispatch(setMaps(maps));
-                const sharedWith = get(maps, ['0', 'sharedWith'], {});
-                const selectedMapId = get(maps, ['0', 'id']);
-                dispatch(setSelectedMap(selectedMapId));
-                dispatch(fetchUsers(Object.keys(sharedWith)));
-                dispatch(fetchNotes(selectedMapId));
-            })
-            .catch(err => {
-                dispatch(nav.isRejected(err));
-            });
+async function fetchMapsForUser (uid, limit) {
+    const sharedWithUid = new FieldPath('sharedWith', uid);
+    const query = db.collection('maps').where(sharedWithUid, '==', true);
+    const snapshot = await (limit ? query.limit(1).get() : query.get());
+    const maps = getDataWithId(snapshot.docs);
+    return maps;
+}
+
+async function fetchMapById (mapId) {
+    const doc = await db
+        .collection('maps')
+        .doc(mapId)
+        .get();
+    const map = doc.data();
+    map.id = doc.id;
+    return map;
+}
+
+function withStatusUpdates (cb) {
+    return async (...args) => {
+        const [dispatch] = args;
+        dispatch(isLoading());
+        try {
+            await cb(...args);
+            dispatch(isResolved());
+        } catch (err) {
+            dispatch(isRejected(err));
+        }
     };
+}
+
+export const fetchFirstMapAndNotes = () => {
+    return withStatusUpdates(async (dispatch, getState) => {
+        const state = getState();
+        const maps = await fetchMapsForUser(getUid(state), 1);
+        dispatch(setMaps(maps));
+        const [map] = maps;
+        const mapId = map.id;
+        dispatch(setSelectedMap(mapId));
+        return Promise.all([
+            dispatch(fetchUsersOfMap(mapId)),
+            dispatch(fetchNotes(mapId))
+        ]);
+    });
+};
+
+export const fetchSelectedMap = mapId => {
+    return withStatusUpdates(async dispatch => {
+        await dispatch(fetchMap(mapId));
+        return Promise.all([
+            dispatch(fetchUsersOfMap(mapId)),
+            dispatch(fetchNotes(mapId))
+        ]);
+    });
 };
 
 export const fetchMap = mapId => {
-    return dispatch => {
-        return db
-            .collection('maps')
-            .doc(mapId)
-            .get()
-            .then(doc => {
-                const map = doc.data();
-                map.id = doc.id;
-                dispatch(setMaps([map]));
-                const sharedWith = get(map, ['0', 'sharedWith'], {});
-                dispatch(fetchUsers(Object.keys(sharedWith)));
-            });
-    };
+    return withStatusUpdates(async dispatch => {
+        const map = await fetchMapById(mapId);
+        dispatch(setMaps([map]));
+        return Promise.all([
+            dispatch(fetchUsersOfMap(mapId)),
+            dispatch(fetchNotes(mapId))
+        ]);
+    });
 };
 
 export const fetchMaps = () => {
-    return (dispatch, getState) => {
-        const uid = get(getState(), ['auth', 'user', 'uid']);
-        const sharedWithUid = new FieldPath('sharedWith', uid);
-        return db
-            .collection('maps')
-            .where(sharedWithUid, '==', true)
-            .get()
-            .then(snapshot => {
-                const maps = snapshot.docs.map(doc => {
-                    const data = doc.data();
-                    data.id = doc.id;
-                    return data;
-                });
-                dispatch(setMaps(maps));
-                const userIds = flatten(maps.map(map => Object.keys(map.sharedWith)));
-                dispatch(userIds);
-            });
-    };
+    return withStatusUpdates(async (dispatch, getState) => {
+        const state = getState();
+        const uid = getUid(state);
+        const maps = await fetchMapsForUser(uid);
+        dispatch(setMaps(maps));
+        const userIds = flatten(maps.map(map => Object.keys(map.sharedWith)));
+        dispatch(fetchUsers(userIds));
+    });
 };
 
 export const setMaps = maps => ({
@@ -79,4 +92,16 @@ export const setMaps = maps => ({
 export const setSelectedMap = selectedMapId => ({
     type: 'maps/setSelectedMap',
     selectedMapId
+});
+
+export const isLoading = () => ({
+    type: 'maps/isLoading'
+});
+
+export const isResolved = () => ({
+    type: 'maps/isResolved'
+});
+
+export const isRejected = () => ({
+    type: 'maps/isRejected'
 });

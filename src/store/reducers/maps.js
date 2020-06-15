@@ -2,7 +2,8 @@ import keyBy from 'lodash/keyBy';
 
 const initState = {
     byId: {},
-    selectedMapId: null
+    selectedMapId: undefined,
+    state: 'resolved'
 };
 
 const maps = (state = initState, action) => {
@@ -19,6 +20,22 @@ const maps = (state = initState, action) => {
             return {
                 ...state,
                 selectedMapId: action.selectedMapId
+            };
+
+        case 'maps/isLoading':
+            return {
+                ...state,
+                status: 'loading'
+            };
+        case 'maps/isResolved':
+            return {
+                ...state,
+                status: 'resolved'
+            };
+        case 'maps/isRejected':
+            return {
+                ...state,
+                status: 'rejected'
             };
         default:
             return state;

@@ -26,30 +26,24 @@ export const signedOut = () => ({
 });
 
 export const signOut = () => {
-    return dispatch => {
+    return async dispatch => {
         dispatch(signingOut());
-        firebaseSignOut().then(() => {
-            dispatch(signedOut());
-        });
+        await firebaseSignOut();
+        dispatch(signedOut());
     };
 };
 
 export const loginWithEmailAndPassword = (email, password) => {
-    return dispatch => {
+    return async dispatch => {
         dispatch(signingIn());
-        return firebaseSignInWithEmailAndPassword(email, password).then(() => {
-            dispatch(signedIn());
-        });
+        await firebaseSignInWithEmailAndPassword(email, password);
+        dispatch(signedIn());
     };
 };
 
-export function firebaseSignInWithEmailAndPassword (email, password) {
-    return firebase
-        .auth()
-        .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-        .then(() => {
-            return firebase.auth().signInWithEmailAndPassword(email, password);
-        });
+export async function firebaseSignInWithEmailAndPassword (email, password) {
+    await firebase.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    return firebase.auth().signInWithEmailAndPassword(email, password);
 }
 
 export function firebaseSignOut () {
@@ -57,20 +51,15 @@ export function firebaseSignOut () {
 }
 
 export const loginAnonymously = () => {
-    return dispatch => {
+    return async dispatch => {
         dispatch(signingIn());
-        return firebaseLoginAnonymously().then(() => {
-            dispatch({type: 'auth/isAnon'});
-            dispatch(signedIn());
-        });
+        await firebaseLoginAnonymously();
+        dispatch({ type: 'auth/isAnon' });
+        dispatch(signedIn());
     };
 };
 
-export function firebaseLoginAnonymously () {
-    return firebase
-        .auth()
-        .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-        .then(() => {
-            return firebase.auth().signInAnonymously();
-        });
+export async function firebaseLoginAnonymously () {
+    await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    firebase.auth().signInAnonymously();
 }

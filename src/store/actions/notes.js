@@ -1,98 +1,99 @@
-import {db} from '~/firebase';
-import {nowTimestamp, getDataWithId} from '~/util';
-import get from 'lodash/get';
-import nav from './nav';
+import { db } from '~/firebase';
+import { nowTimestamp, getDataWithId, getUid } from '~/util';
 
-const pathToUid = ['auth', 'user', 'uid'];
+function withStatusUpdates (cb) {
+    return async (...args) => {
+        const [dispatch] = args;
+        dispatch(isLoading());
+        try {
+            await cb(...args);
+            dispatch(isResolved());
+        } catch (err) {
+            dispatch(isRejected(err));
+        }
+    };
+}
+
+async function fetchNotesByMapId (mapId) {
+    const snapshot = await db
+        .collection('notes')
+        .where('mapId', '==', mapId)
+        .get();
+
+    const notes = getDataWithId(snapshot.docs);
+    return notes;
+}
+
+async function add (note) {
+    const doc = await db.collection('notes').add(note);
+    return {
+        ...note,
+        id: doc.id
+    };
+}
+
+async function update (note) {
+    await db
+        .collection('notes')
+        .doc(note.id)
+        .update(note);
+
+    return { ...note };
+}
+
+async function remove (noteId) {
+    await db
+        .collection('notes')
+        .doc(noteId)
+        .delete();
+    return noteId;
+}
 
 export const fetchNotes = mapId => {
-    return dispatch => {
-        dispatch(nav.isLoading());
-        db.collection('notes')
-            .where('mapId', '==', mapId)
-            .get()
-            .then(snapshot => {
-                const notes = getDataWithId(snapshot.docs);
-                dispatch(addSubsetOfNotes(notes));
-                dispatch(nav.isResolved());
-            })
-            .catch(err => {
-                dispatch(nav.isRejected(err));
-            });
-    };
+    return withStatusUpdates(async dispatch => {
+        const notes = await fetchNotesByMapId(mapId);
+        dispatch(addSubsetOfNotes(notes));
+    });
 };
 
 export const saveNote = (mapId, note) => {
     return !note.id ? addNote(mapId, note) : updateNote(note);
 };
 
-export const addNote = (mapId, note) => {
-    return (dispatch, getState) => {
-        dispatch(isLoading());
+export const addNote = (mapId, { location, message, rawMessage }) => {
+    return withStatusUpdates(async (dispatch, getState) => {
         const state = getState();
-        const uid = get(state, pathToUid);
-        const {location, message, rawMessage} = note;
-        const newNote = {
-            createdAt: nowTimestamp(),
-            createdBy: uid,
+        const uid = getUid(state);
+        const note = await add({
             location,
             message,
             rawMessage,
-            mapId
-        };
-
-        return db.collection('notes')
-            .add(newNote)
-            .then(doc => {
-                newNote.id = doc.id;
-                dispatch(setNote(newNote));
-                dispatch(isResolved());
-            })
-            .catch(err => {
-                dispatch(isRejected(err));
-                return Promise.reject(err);
-            });
-    };
+            mapId,
+            createdAt: nowTimestamp(),
+            createdBy: uid
+        });
+        dispatch(setNote(note));
+    });
 };
 
 export const updateNote = note => {
-    return (dispatch, getState) => {
-        dispatch(isLoading());
+    return withStatusUpdates(async (dispatch, getState) => {
         const state = getState();
-        const uid = get(state, pathToUid);
-        const updatedNote = {
+        const uid = getUid(state);
+        const updatedNote = await update({
             ...note,
             updatedAt: nowTimestamp(),
             updatedBy: uid
-        };
-        return db.collection('notes')
-            .doc(note.id)
-            .update(updatedNote)
-            .then(() => {
-                dispatch(setNote(updatedNote));
-                dispatch(isResolved());
-            }, err => {
-                dispatch(isRejected(err));
-                return Promise.reject(err);
-            });
-    };
+        });
+        dispatch(setNote(updatedNote));
+    });
 };
 
 export const deleteNote = noteId => {
-    return dispatch => {
-        dispatch(isLoading());
-        return db.collection('notes')
-            .doc(noteId)
-            .delete()
-            .then(() => {
-                dispatch(removeNote(noteId));
-                dispatch(isResolved());
-            })
-            .catch(err => {
-                dispatch(isRejected(err));
-                return Promise.reject(err);
-            });
-    };
+    return withStatusUpdates(async dispatch => {
+        await remove(noteId);
+        dispatch(removeNote(noteId));
+    });
 };
 
 export const addSubsetOfNotes = notes => ({
@@ -122,8 +123,4 @@ export const isResolved = () => ({
 
 export const isRejected = () => ({
     type: 'notes/isRejected'
-});
-
-export const resetState = () => ({
-    type: 'notes/resetState'
 });

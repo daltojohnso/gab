@@ -48,3 +48,7 @@ export const EDITOR_STATES = {
     empty: 'empty',
     lock: 'lock'
 };
+
+export function getUid (state) {
+    return get(state, ['auth', 'user', 'uid']);
+}

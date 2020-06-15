@@ -2,7 +2,7 @@ import React from 'react';
 import { MainView, FooView } from '~/pages';
 import { Route } from 'react-router-dom';
 
-const NavView = () => (
+const AuthedRoutes = () => (
     <>
         <Route exact path="/foo" component={FooView} />
         <Route exact path="/" component={MainView} />
@@ -11,4 +11,4 @@ const NavView = () => (
     </>
 );
 
-export default NavView;
+export default AuthedRoutes;

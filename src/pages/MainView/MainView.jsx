@@ -7,8 +7,7 @@ import {
     fetchFirstMapAndNotes,
     setSelectedMap
 } from '~/store/actions/maps';
-import { fetchNotes, saveNote, deleteNote } from '~/store/actions/notes';
-import { fetchUsersOfMap } from '~/store/actions/users';
+import { saveNote, deleteNote } from '~/store/actions/notes';
 import filter from 'lodash/filter';
 import values from 'lodash/values';
 
@@ -22,7 +21,7 @@ const MainView = () => {
     const [selectedNote, setSelectedNote] = useState(undefined);
     const [editorState, setEditorState] = useState(undefined);
     const dispatch = useDispatch();
-    const isLoading = useSelector(state => state.nav.status === 'loading');
+    const usersLoaded = useSelector(state => state.users.status === 'resolved');
     const noteStatus = useSelector(state => state.notes.status);
     const selectedMapId = useSelector(state => state.maps.selectedMapId);
     const notes = useSelector(state =>
@@ -33,23 +32,11 @@ const MainView = () => {
     const pinMap = useSelector(state => state.auth.user.isAnon === true);
 
     useEffect(() => {
-        if (!selectedMapId) {
-            dispatch(fetchFirstMapAndNotes());
-        } else {
-            batch(() => {
-                dispatch(setSelectedMap(selectedMapId));
-                dispatch(fetchMap(selectedMapId)).then(() => {
-                    batch(() => {
-                        dispatch(fetchUsersOfMap(selectedMapId));
-                        dispatch(fetchNotes(selectedMapId));
-                    });
-                });
-            });
-        }
-    }, [dispatch, selectedMapId]);
+        dispatch(fetchFirstMapAndNotes());
+    }, [dispatch]);
 
     const onMapClick = location => {
-        if (isLoading) return;
+        if (!usersLoaded) return;
 
         if (editorState === STATES.moving) {
             setSelectedNote({

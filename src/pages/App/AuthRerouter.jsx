@@ -9,15 +9,15 @@ export const AuthedRerouter = ({
 }) => (
     <Route
         {...rest}
-        render={p =>
-            isLoggedIn ? (
+        render={p => {
+            return isLoggedIn ? (
                 <Component {...p} />
             ) : (
                 <Redirect
                     to={{ pathname: '/login', state: { from: p.location } }}
                 />
-            )
-        }
+            );
+        }}
     />
 );
 AuthedRerouter.propTypes = {

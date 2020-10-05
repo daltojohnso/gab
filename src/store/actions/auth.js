@@ -1,4 +1,4 @@
-import firebase from 'firebase/app';
+import * as firebase from 'firebase/app';
 
 export const appReady = () => ({
     type: 'auth/appReady'
@@ -42,7 +42,8 @@ export const loginWithEmailAndPassword = (email, password) => {
 };
 
 export async function firebaseSignInWithEmailAndPassword (email, password) {
-    await firebase.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
     return firebase.auth().signInWithEmailAndPassword(email, password);
 }
 

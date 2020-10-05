@@ -21,4 +21,4 @@ ReactDOM.render(
 );
 
 // eslint-disable-next-line no-undef
-module.hot && module.hot.accept();
+// module.hot && module.hot.accept();

@@ -2,7 +2,7 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { LoginView } from '~/pages';
 import PropTypes from 'prop-types';
-import { BrowserRouter as Router, Switch } from 'react-router-dom';
+import { BrowserRouter, Switch } from 'react-router-dom';
 import { loginAnonymously } from '~/store/actions/auth';
 import { AuthedRerouter, UnauthedRerouter } from './AuthRerouter.jsx';
 import AuthedRoutes from './AuthedRoutes.jsx';
@@ -17,7 +17,7 @@ const App = () => {
     }
 
     return isReady ? (
-        <Router>
+        <BrowserRouter>
             <Switch>
                 <UnauthedRerouter
                     exact
@@ -38,7 +38,7 @@ const App = () => {
                     isLoggedIn={isLoggedIn}
                 />
             </Switch>
-        </Router>
+        </BrowserRouter>
     ) : null;
 };
 

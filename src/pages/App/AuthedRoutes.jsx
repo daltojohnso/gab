@@ -1,13 +1,18 @@
 import React from 'react';
-import { MainView, FooView } from '~/pages';
+import { FooView, MapCardView, MapView } from '~/pages';
 import { Route } from 'react-router-dom';
 
 const AuthedRoutes = () => (
     <>
+        <Route exact path="/foo/:mapId" component={FooView} />
         <Route exact path="/foo" component={FooView} />
-        <Route exact path="/" component={MainView} />
-        <Route exact path="/map/:mapId" component={MainView} />
-        <Route exact path="/map/:mapId/note/:noteId" component={MainView} />
+        <Route exact path="/map" component={MapCardView} />
+        <Route exact path={['/map/:mapId', '/map/:mapId/note/:noteId']}>
+            <MapView />
+        </Route>
+        <Route exact path="/">
+            <MapCardView />
+        </Route>
     </>
 );
 

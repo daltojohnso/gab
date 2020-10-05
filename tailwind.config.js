@@ -234,8 +234,11 @@ module.exports = {
             '32': '8rem',
             '48': '12rem',
             '64': '16rem',
+            '80': '20rem',
             '96': '24rem',
             full: '100%',
+            '80vh': '80vh',
+            '90vh': '90vh',
             screen: '100vh',
             inherit: 'inherit'
         },
@@ -339,6 +342,7 @@ module.exports = {
             '50': '.5',
             '75': '.75',
             '90': '.90',
+            '95': '.95',
             '100': '1'
         },
         fill: {
@@ -350,6 +354,11 @@ module.exports = {
         container: {
             center: true,
             padding: '1rem'
+        },
+        inset: {
+            '0': 0,
+            auto: 'auto',
+            '20vh': '20vh'
         }
     },
     variants: {

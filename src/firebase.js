@@ -7,9 +7,11 @@ import store from '~/store';
 import { batch } from 'react-redux';
 
 firebase.initializeApp(config);
+
 export const db = firebase.firestore();
 export const GeoPoint = firebase.firestore.GeoPoint;
 export const Timestamp = firebase.firestore.Timestamp;
+export const FieldPath = firebase.firestore.FieldPath;
 
 firebase.auth().onAuthStateChanged(user => {
     batch(() => {

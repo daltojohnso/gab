@@ -1,10 +1,8 @@
-import { db } from '~/firebase';
-import flatten from 'lodash/flatten';
-import firebase from 'firebase/app';
-import { fetchNotes } from './notes';
-import { fetchUsers, fetchUsersOfMap } from './users';
-import { getDataWithId, getUid } from '~/util';
-const FieldPath = firebase.firestore.FieldPath;
+import { db, FieldPath } from '~/firebase';
+import { fetchNotes, deleteNotesByMapId } from './notes';
+import { fetchUsersOfMap } from './users';
+import { nowTimestamp, getDataWithId, getUid } from '~/util';
+import format from 'date-fns/format';
 
 async function fetchMapsForUser (uid, limit) {
     const sharedWithUid = new FieldPath('sharedWith', uid);
@@ -37,30 +35,34 @@ function withStatusUpdates (cb) {
     };
 }
 
-export const fetchFirstMapAndNotes = () => {
-    return withStatusUpdates(async (dispatch, getState) => {
-        const state = getState();
-        const maps = await fetchMapsForUser(getUid(state), 1);
-        dispatch(setMaps(maps));
-        const [map] = maps;
-        const mapId = map.id;
-        dispatch(setSelectedMap(mapId));
-        return Promise.all([
-            dispatch(fetchUsersOfMap(mapId)),
-            dispatch(fetchNotes(mapId))
-        ]);
-    });
-};
+async function add (map) {
+    try {
+        const doc = await db.collection('maps').add(map);
+        return {
+            ...map,
+            id: doc.id
+        };
+    } catch (err) {
+        console.error(err);
+    }
+}
 
-export const fetchSelectedMap = mapId => {
-    return withStatusUpdates(async dispatch => {
-        await dispatch(fetchMap(mapId));
-        return Promise.all([
-            dispatch(fetchUsersOfMap(mapId)),
-            dispatch(fetchNotes(mapId))
-        ]);
-    });
-};
+async function update (map) {
+    await db
+        .collection('maps')
+        .doc(map.id)
+        .update(map);
+
+    return { ...map };
+}
+
+async function remove (mapId) {
+    await db
+        .collection('maps')
+        .doc(mapId)
+        .delete();
+    return mapId;
+}
 
 export const fetchMap = mapId => {
     return withStatusUpdates(async dispatch => {
@@ -79,8 +81,40 @@ export const fetchMaps = () => {
         const uid = getUid(state);
         const maps = await fetchMapsForUser(uid);
         dispatch(setMaps(maps));
-        const userIds = flatten(maps.map(map => Object.keys(map.sharedWith)));
-        dispatch(fetchUsers(userIds));
+    });
+};
+
+export const addMap = () => {
+    return withStatusUpdates(async (dispatch, getState) => {
+        const uid = getUid(getState());
+        const formattedDate = format(new Date(), 'PPpp');
+        const map = await add({
+            name: `New Map, ${formattedDate}`,
+            sharedWith: {
+                [uid]: true
+            },
+            createdAt: nowTimestamp(),
+            createdBy: uid
+        });
+        if (!map) return;
+        dispatch(setMaps([map]));
+        window.location = `/map/${map.id}`;
+    });
+};
+
+export const updateMap = (map = {}) => {
+    return withStatusUpdates(async dispatch => {
+        const updatedMap = await update({
+            ...map
+        });
+        dispatch(setMaps([updatedMap]));
+    });
+};
+
+export const deleteMapAndNotes = mapId => {
+    return withStatusUpdates(async dispatch => {
+        await Promise.all([remove(mapId), dispatch(deleteNotesByMapId(mapId))]);
+        dispatch(removeMap(mapId));
     });
 };
 
@@ -94,6 +128,11 @@ export const setSelectedMap = selectedMapId => ({
     selectedMapId
 });
 
+export const removeMap = mapId => ({
+    type: 'maps/remove',
+    mapId
+});
+
 export const isLoading = () => ({
     type: 'maps/isLoading'
 });
@@ -102,6 +141,7 @@ export const isResolved = () => ({
     type: 'maps/isResolved'
 });
 
-export const isRejected = () => ({
-    type: 'maps/isRejected'
+export const isRejected = error => ({
+    type: 'maps/isRejected',
+    error
 });

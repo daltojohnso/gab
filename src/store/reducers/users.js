@@ -1,7 +1,8 @@
 import keyBy from 'lodash/keyBy';
 const initState = {
     byId: {},
-    state: 'resolved'
+    state: 'resolved',
+    error: undefined
 };
 const users = (state = initState, action) => {
     switch (action.type) {
@@ -17,17 +18,20 @@ const users = (state = initState, action) => {
         case 'users/isLoading':
             return {
                 ...state,
-                status: 'loading'
+                status: 'loading',
+                error: undefined
             };
         case 'users/isResolved':
             return {
                 ...state,
-                status: 'resolved'
+                status: 'resolved',
+                error: undefined
             };
         case 'users/isRejected':
             return {
                 ...state,
-                status: 'rejected'
+                status: 'rejected',
+                error: action.error
             };
         default:
             return state;

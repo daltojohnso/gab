@@ -49,6 +49,13 @@ async function remove (noteId) {
     return noteId;
 }
 
+function removeNotesByMapId (mapId) {
+    return db
+        .collection('notes')
+        .where('mapId', '==', mapId)
+        .delete();
+}
+
 export const fetchNotes = mapId => {
     return withStatusUpdates(async dispatch => {
         const notes = await fetchNotesByMapId(mapId);
@@ -96,6 +103,13 @@ export const deleteNote = noteId => {
     });
 };
 
+export const deleteNotesByMapId = mapId => {
+    return withStatusUpdates(async dispatch => {
+        await removeNotesByMapId(mapId);
+        dispatch(removeByMapId(mapId));
+    });
+};
+
 export const addSubsetOfNotes = notes => ({
     type: 'notes/addSubset',
     notes
@@ -113,6 +127,11 @@ export const removeNote = noteId => ({
     noteId
 });
 
+export const removeByMapId = mapId => ({
+    type: 'notes/removeByMapId',
+    mapId
+});
+
 export const isLoading = () => ({
     type: 'notes/isLoading'
 });
@@ -121,6 +140,7 @@ export const isResolved = () => ({
     type: 'notes/isResolved'
 });
 
-export const isRejected = () => ({
-    type: 'notes/isRejected'
+export const isRejected = error => ({
+    type: 'notes/isRejected',
+    error
 });

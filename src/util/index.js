@@ -3,6 +3,7 @@ import isArray from 'lodash/isArray';
 import isPlainObject from 'lodash/isPlainObject';
 import toPairs from 'lodash/toPairs';
 import get from 'lodash/get';
+import { EditorState, ContentState, convertFromRaw } from 'draft-js';
 
 // this could be better
 export function bindAll (_this, fns = []) {
@@ -34,21 +35,44 @@ export function getDataWithId (docs) {
     });
 }
 
+export const EDITOR_EVENTS = {};
+
 export const EDITOR_STATES = {
     edit: 'edit',
     delete: 'delete',
     confirmDelete: 'confirmDelete',
+    closeEdited: 'closeEdited',
+    confirmClose: 'confirmClose',
     move: 'move',
     saveNewLocation: 'saveNewLocation',
     focus: 'focus',
     close: 'close',
-    closeEdited: 'closeEdited',
-    confirmClose: 'confirmClose',
     save: 'save',
     empty: 'empty',
-    lock: 'lock'
+    lock: 'lock',
+    open: 'open',
+    closed: 'closed'
 };
 
 export function getUid (state) {
     return get(state, ['auth', 'user', 'uid']);
 }
+
+export function getEditorStateFromNote (note) {
+    let contentState;
+    if (note) {
+        if (note.editorState) return note.editorState;
+
+        try {
+            contentState = convertFromRaw(note.rawMessage);
+        } catch (err) {
+            contentState = ContentState.createFromText(note.message || '');
+        }
+    }
+
+    return contentState
+        ? EditorState.createWithContent(contentState)
+        : EditorState.createEmpty();
+}
+
+export const EMPTY_EDITOR_STATE = EditorState.createEmpty();

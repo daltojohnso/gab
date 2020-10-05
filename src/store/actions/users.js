@@ -56,6 +56,7 @@ export const isResolved = () => ({
     type: 'users/isResolved'
 });
 
-export const isRejected = () => ({
-    type: 'users/isRejected'
+export const isRejected = error => ({
+    type: 'users/isRejected',
+    error
 });

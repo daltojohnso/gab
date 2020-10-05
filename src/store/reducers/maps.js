@@ -2,11 +2,12 @@ import keyBy from 'lodash/keyBy';
 
 const initState = {
     byId: {},
-    selectedMapId: undefined,
-    state: 'resolved'
+    state: 'resolved',
+    error: undefined
 };
 
 const maps = (state = initState, action) => {
+    let mapId;
     switch (action.type) {
         case 'maps/setSubset':
             return {
@@ -16,26 +17,32 @@ const maps = (state = initState, action) => {
                     ...keyBy(action.maps, 'id')
                 }
             };
-        case 'maps/setSelectedMap':
+        case 'maps/remove':
+            mapId = action.mapId;
+            delete state.byId[mapId];
             return {
                 ...state,
-                selectedMapId: action.selectedMapId
+                byId: {
+                    ...state.byId
+                }
             };
-
         case 'maps/isLoading':
             return {
                 ...state,
-                status: 'loading'
+                status: 'loading',
+                error: undefined
             };
         case 'maps/isResolved':
             return {
                 ...state,
-                status: 'resolved'
+                status: 'resolved',
+                error: undefined
             };
         case 'maps/isRejected':
             return {
                 ...state,
-                status: 'rejected'
+                status: 'rejected',
+                error: action.error
             };
         default:
             return state;

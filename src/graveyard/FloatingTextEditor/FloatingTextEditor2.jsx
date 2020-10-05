@@ -5,6 +5,7 @@ import styled from 'styled-components';
 const AbsolutePositioningDiv = styled.div`
     right: 5rem;
     top: 8rem;
+    z-index: 401;
 
     @media screen and (max-width: 767px) {
         right: 0;

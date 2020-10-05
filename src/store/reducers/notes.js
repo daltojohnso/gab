@@ -1,20 +1,13 @@
 import keyBy from 'lodash/keyBy';
+import omitBy from 'lodash/omitBy';
 const initState = {
     byId: {},
-    status: 'resolved'
+    status: 'resolved',
+    error: undefined
 };
 const notes = (state = initState, action) => {
     let noteId;
     switch (action.type) {
-        // will I ever need this?
-        // clobber the entire store of notes
-        // with, presumably, "all" notes, but
-        // what is "all" when notes can be shared?
-        case 'notes/setAll':
-            return {
-                ...state,
-                byId: keyBy(action.notes, 'id')
-            };
         case 'notes/addSubset':
             return {
                 ...state,
@@ -42,22 +35,33 @@ const notes = (state = initState, action) => {
             noteId = action.noteId;
             delete state.byId[noteId];
             return {
-                ...state
+                ...state,
+                byId: {
+                    ...state.byId
+                }
+            };
+        case 'notes/removeByMapId':
+            return {
+                ...state,
+                byId: omitBy(state.byId, note => note.mapId === action.mapId)
             };
         case 'notes/isLoading':
             return {
                 ...state,
-                status: 'loading'
+                status: 'loading',
+                error: undefined
             };
         case 'notes/isResolved':
             return {
                 ...state,
-                status: 'resolved'
+                status: 'resolved',
+                error: undefined
             };
         case 'notes/isRejected':
             return {
                 ...state,
-                status: 'rejected'
+                status: 'rejected',
+                error: action.error
             };
         default:
             return state;

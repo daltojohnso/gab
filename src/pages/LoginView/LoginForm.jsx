@@ -35,6 +35,7 @@ const LoginForm = ({ onFormSubmit }) => {
                     type="text"
                     placeholder="Email"
                     value={email}
+                    autoComplete="email"
                     onChange={e => setEmail(e.target.value)}
                 />
             </div>
@@ -51,6 +52,7 @@ const LoginForm = ({ onFormSubmit }) => {
                     type="password"
                     placeholder="******************"
                     value={password}
+                    autoComplete="current-password"
                     onChange={e => setPassword(e.target.value)}
                 />
                 <p className="text-red text-xs italic">{error}</p>
